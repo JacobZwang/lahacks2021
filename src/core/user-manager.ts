@@ -1,5 +1,5 @@
 import type StateManager from "./state-manager";
-import User from "./user"
+import User from "./user";
 
 export default class UserManager {
     users: Map<string, User>;
@@ -18,6 +18,6 @@ export default class UserManager {
     }
 
     setActiveUser(user: User) {
-        this.activeUser = user
+        this.activeUser = user;
     }
 }

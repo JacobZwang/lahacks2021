@@ -6,7 +6,7 @@ export default class Wall {
         neighborTop: boolean,
         neighborRight: boolean,
         neighborBottom: boolean,
-        neighborLeft: boolean,
+        neighborLeft: boolean
     ) {
         this.wall = document.createElement("div");
         this.wall.style.backgroundColor = "grey";
@@ -26,7 +26,8 @@ export default class Wall {
             neighborTop === true &&
             neighborBottom === true &&
             neighborLeft === false &&
-            neighborRight === false) {
+            neighborRight === false
+        ) {
             this.wall.style.height = "100%";
             this.wall.style.width = "50%";
             this.wall.style.marginLeft = "25%";
@@ -34,7 +35,8 @@ export default class Wall {
             neighborTop === false &&
             neighborBottom === false &&
             neighborLeft === true &&
-            neighborRight === false) {
+            neighborRight === false
+        ) {
             this.wall.style.height = "50%";
             this.wall.style.width = "50%";
             this.wall.style.marginRight = "25%";
@@ -43,7 +45,8 @@ export default class Wall {
             neighborTop === false &&
             neighborBottom === false &&
             neighborLeft === true &&
-            neighborRight === false) {
+            neighborRight === false
+        ) {
             this.wall.style.height = "50%";
             this.wall.style.width = "50%";
             this.wall.style.marginLeft = "25%";

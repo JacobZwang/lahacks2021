@@ -1,5 +1,5 @@
-import Tile from "./tile"
-import type StateManager from "./state-manager"
+import Tile from "./tile";
+import type StateManager from "./state-manager";
 
 /**manages the tile container and the creation/management of tiles*/
 export default class TileManager {
@@ -7,14 +7,19 @@ export default class TileManager {
     target: HTMLDivElement;
     manager: StateManager;
 
-    constructor(manager: StateManager, target: HTMLDivElement, width: number, height: number) {
+    constructor(
+        manager: StateManager,
+        target: HTMLDivElement,
+        width: number,
+        height: number
+    ) {
         this.target = target;
         this.target.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
         this.target.style.gridTemplateRows = `repeat(${height}, 1fr)`;
 
         const margin = 20;
 
-        this.manager = manager
+        this.manager = manager;
 
         if (window.innerHeight < window.innerWidth) {
             //add math to make fit on screen when it isn't square

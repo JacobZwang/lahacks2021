@@ -1,5 +1,5 @@
-import Wall from "./wall"
-import type User from "./user"
+import Wall from "./wall";
+import type User from "./user";
 import type TileManager from "./tile-manager";
 
 /**tile is appended to grid apon creation*/
@@ -40,8 +40,8 @@ export default class Tile {
 
         this.tile.addEventListener("contextmenu", () => {
             const self = this;
-            this.manager.manager.userManager.activeUser.setLocation(self)
-        })
+            this.manager.manager.userManager.activeUser.setLocation(self);
+        });
     }
 
     /**assigns the neighboring walls to variables on the wall for later use*/
@@ -54,9 +54,10 @@ export default class Tile {
 
     get hasWall() {
         if (this.tile.querySelector('[role="wall"]')) {
-            return true
+            return true;
+        } else {
+            return false;
         }
-        else { return false }
     }
 
     /**creates outline around tile*/
@@ -66,11 +67,12 @@ export default class Tile {
 
     /**appends wall to tile*/
     addWall() {
-        const wall = new Wall(this.tile,
+        const wall = new Wall(
+            this.tile,
             this.neighborTop.hasWall,
             this.neighborRight.hasWall,
             this.neighborBottom.hasWall,
-            this.neighborLeft.hasWall,
+            this.neighborLeft.hasWall
         );
     }
 

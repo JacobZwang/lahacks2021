@@ -1,17 +1,21 @@
 import TileManager from "./tile-manager";
-import type User from "./user"
-import UserManager from "./user-manager"
+import type User from "./user";
+import UserManager from "./user-manager";
 
 export default class StateManager {
-    userManager: UserManager
-    tileManager: TileManager
+    userManager: UserManager;
+    tileManager: TileManager;
+    clientUser: User;
 
     constructor(width: number, height: number) {
         const self = this;
         this.userManager = new UserManager(self);
-        this.tileManager = new TileManager(self, document.getElementById("grid") as HTMLDivElement,
+        this.tileManager = new TileManager(
+            self,
+            document.getElementById("grid") as HTMLDivElement,
             width,
-            height);
+            height
+        );
 
         for (let i = 0; i < width * height; i++) {
             const tile = this.tileManager.createTile();
@@ -27,7 +31,7 @@ export default class StateManager {
             );
         });
 
-        const selfUser = this.userManager.createUser({ id: "self" });
-        this.userManager.setActiveUser(selfUser);
+        const clientUser = this.userManager.createUser({ id: "self" });
+        this.userManager.setActiveUser(clientUser);
     }
 }

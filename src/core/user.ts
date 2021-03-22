@@ -1,4 +1,4 @@
-import type Tile from "./tile"
+import type Tile from "./tile";
 import type UserManager from "./user-manager";
 
 export default class User {
@@ -12,10 +12,10 @@ export default class User {
         this.avatar = document.createElement("div");
         this.avatar.setAttribute("role", "user");
         this.avatar.style.background = "blue";
-        this.avatar.style.height = "100%"
-        this.avatar.style.width = "100%"
+        this.avatar.style.height = "100%";
+        this.avatar.style.width = "100%";
         this.id = payload.id;
-        this.userManager = userManager
+        this.userManager = userManager;
     }
 
     setLocation(tile: Tile) {
