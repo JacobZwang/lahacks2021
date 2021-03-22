@@ -1,17 +1,34 @@
-import sirv from "sirv";
-import polka from "polka";
-import compression from "compression";
-import * as sapper from "@sapper/server";
+import sirv from 'sirv';
+import express from 'express';
+import compression from 'compression';
+import * as sapper from '@sapper/server';
+import http from "http";
+import { Server } from "socket.io";
+import HttpServer from "http";
 
 const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === "development";
 
-polka() // You can also use Express
-  .use(
+const app = express();
+app.use(
     compression({ threshold: 0 }),
-    sirv("static", { dev }),
+    sirv('static', { dev }),
     sapper.middleware()
-  )
-  .listen(PORT,'0.0.0.0', (err: any) => {
-    if (err) console.log("error", err);
-  });
+)
+
+const httpServer = new HttpServer.Server(app);
+
+const io = new Server(httpServer, {
+    cors: {
+        origin: "http://localhost:3000",
+    },
+});
+
+io.on('connection', (socket) => {
+    console.log('a user connected');
+});
+
+httpServer.listen(PORT, () => {
+    console.log('socket and sapper running');
+});
+
