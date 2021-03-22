@@ -1,5 +1,10 @@
 # LA Hacks 2021
 
+### Deploy
+[![Run on Google
+Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run/?git_repo=https://github.com/JacobZwang/lahacks2021.git)
+
+
 ### Run Instructions
 
 With Docker Compose (recommended)

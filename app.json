@@ -1,0 +1,8 @@
+{
+    "name": "LaHacks 2021",
+    "env": {
+        "NAME": {
+            "description": "LAHacks 2021 TESTING ENV VARIABLE"
+        }
+    }
+}
