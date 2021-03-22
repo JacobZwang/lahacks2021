@@ -22,9 +22,9 @@ export default class TileManager {
         this.manager = manager;
 
         if (window.innerHeight < window.innerWidth) {
-            //add math to make fit on screen when it isn't square
-            this.target.style.height = window.innerHeight - margin + "px";
-            this.target.style.width = window.innerHeight - margin + "px";
+            //add math to make fit on screen when it isn't square (will also need to change the css grid to something more flexible)
+            this.target.style.height = window.innerHeight + "px";
+            this.target.style.width = window.innerHeight + "px";
         } else {
             this.target.style.height = window.innerWidth + "px";
             this.target.style.width = window.innerWidth + "px";

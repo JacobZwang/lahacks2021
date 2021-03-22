@@ -9,7 +9,6 @@
   main {
     height: 100vh;
     display: grid;
-    align-items: center;
-    justify-items: center;
+    grid-template-columns: 1fr 2fr;
   }
 </style>

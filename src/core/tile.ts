@@ -17,11 +17,11 @@ export default class Tile {
         this.manager = manager;
         this.manager.target.appendChild(this.tile);
 
-        this.tile.addEventListener("click", () => {
+        this.tile.addEventListener("contextmenu", () => {
             this.addWallAndRecalc();
         });
 
-        this.tile.addEventListener("contextmenu", () => {
+        this.tile.addEventListener("click", () => {
             const self = this;
             this.manager.manager.userManager.activeUser.setLocation(self);
         });
@@ -53,7 +53,7 @@ export default class Tile {
 
     /**creates outline around tile*/
     outline() {
-        this.tile.style.border = "2pt solid black";
+        this.tile.style.border = "1px solid black";
     }
 
     /**appends wall to tile*/

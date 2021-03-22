@@ -5,6 +5,8 @@
   import TileManager from "../core/tile-manager";
   import UserManager from "../core/user-manager";
 
+  import SidePanel from "../components/SidePanel.svelte";
+
   import templateWalls from "../templates/template-1/walls";
 
   const socket = io();
@@ -28,7 +30,7 @@
   });
 </script>
 
-<!-- <button on:click={() => stateManager.getWallsAsJSON()}> print walls </button> -->
+<SidePanel {stateManager} />
 <div id="grid" />
 
 <style>
@@ -37,5 +39,9 @@
     grid-template-columns: repeat(30, 1fr);
     grid-template-rows: repeat(30, 1fr);
     height: 100%;
+  }
+
+  :global(#grid > div:hover) {
+    background-color: rgb(216, 216, 216);
   }
 </style>

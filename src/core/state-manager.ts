@@ -20,7 +20,7 @@ export default class StateManager {
 
         for (let i = 0; i < width * height; i++) {
             const tile = this.tileManager.createTile();
-            tile.outline();
+            // tile.outline();
         }
 
         this.tileManager.tiles.forEach((tile, i) => {
@@ -43,7 +43,7 @@ export default class StateManager {
                 walls.push(i);
             }
         });
-        console.log(walls.toString());
+        return walls.toString();
     }
 
     /**calculates the distances all uses are away from the client user*/
