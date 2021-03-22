@@ -7,7 +7,7 @@ import { Server } from "socket.io";
 import { createServer } from "http";
 
 const { PORT, NODE_ENV } = process.env;
-const dev = NODE_ENV === 'development';
+const dev = NODE_ENV === "development";
 
 const httpServer = createServer();
 const app = polka();
