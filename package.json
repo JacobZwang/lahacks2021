@@ -14,7 +14,8 @@
     "express": "^4.17.1",
     "polka": "next",
     "sirv": "^1.0.0",
-    "socket.io": "^4.0.0"
+    "socket.io": "^4.0.0",
+    "socket.io-client": "^4.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
