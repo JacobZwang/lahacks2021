@@ -1,0 +1,2 @@
+echo "PREBUILD"
+echo $NAME
