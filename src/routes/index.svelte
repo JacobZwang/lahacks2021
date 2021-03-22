@@ -35,7 +35,7 @@
     /**saves tile to state and appends to target*/
     createTile() {
       const tile = new Tile(this.target);
-      this.tiles.push();
+      this.tiles.push(tile);
       return tile;
     }
   }
@@ -44,6 +44,10 @@
   class Tile {
     tile: HTMLDivElement;
     hasWall: boolean;
+    neigborTop: Tile;
+    neigborRight: Tile;
+    neigborBottom: Tile;
+    neigborLeft: Tile;
 
     constructor(target: HTMLDivElement) {
       this.tile = document.createElement("div");
@@ -53,9 +57,32 @@
       this.tile.addEventListener("click", () => {
         if (this.hasWall === false) {
           this.addWall();
+
+          if (this.neigborTop.hasWall) {
+            this.neigborTop.recalculateWall();
+          }
+
+          if (this.neigborRight.hasWall) {
+            this.neigborRight.recalculateWall();
+          }
+
+          if (this.neigborBottom.hasWall) {
+            this.neigborBottom.recalculateWall();
+          }
+
+          if (this.neigborLeft.hasWall) {
+            this.neigborLeft.recalculateWall();
+          }
           this.hasWall = true;
         }
       });
+    }
+
+    assignNeigbors(top: Tile, right: Tile, bottom: Tile, left: Tile) {
+      this.neigborTop = top;
+      this.neigborRight = right;
+      this.neigborBottom = bottom;
+      this.neigborLeft = left;
     }
 
     outline() {
@@ -63,20 +90,64 @@
     }
 
     addWall() {
-      const wall = new Wall(this.tile);
+      const wall = new Wall(this.tile, [
+        this.neigborTop.hasWall,
+        this.neigborRight.hasWall,
+        this.neigborBottom.hasWall,
+        this.neigborLeft.hasWall,
+      ]);
+    }
+
+    recalculateWall() {
+      this.tile.removeChild(this.tile.childNodes[0]);
+      this.addWall();
     }
   }
 
   /**wall is appended to target tile upon creation*/
   class Wall {
     wall: HTMLDivElement;
-    constructor(target: HTMLDivElement) {
+    constructor(
+      target: HTMLDivElement,
+      neighbortWalls: [boolean, boolean, boolean, boolean]
+    ) {
       this.wall = document.createElement("div");
       this.wall.style.height = "100%";
       this.wall.style.width = "50%";
       this.wall.style.margin = "auto";
       this.wall.style.backgroundColor = "grey";
       target.appendChild(this.wall);
+
+      console.log(neighbortWalls);
+      if (
+        neighbortWalls[0] === false &&
+        neighbortWalls[1] === true &&
+        neighbortWalls[2] === false &&
+        neighbortWalls[3] === true
+      ) {
+        this.wall.style.height = "50%";
+        this.wall.style.width = "100%";
+      }
+
+      if (
+        neighbortWalls[0] === false &&
+        neighbortWalls[1] === false &&
+        neighbortWalls[2] === false &&
+        neighbortWalls[3] === true
+      ) {
+        this.wall.style.height = "50%";
+        this.wall.style.width = "100%";
+      }
+
+      if (
+        neighbortWalls[0] === false &&
+        neighbortWalls[1] === true &&
+        neighbortWalls[2] === false &&
+        neighbortWalls[3] === false
+      ) {
+        this.wall.style.height = "50%";
+        this.wall.style.width = "100%";
+      }
     }
   }
 
@@ -94,6 +165,15 @@
       const tile = tileManager.createTile();
       tile.outline();
     }
+
+    tileManager.tiles.forEach((tile, i) => {
+      tile.assignNeigbors(
+        tileManager.tiles[i - width],
+        tileManager.tiles[i + 1],
+        tileManager.tiles[i + width],
+        tileManager.tiles[i - 1]
+      );
+    });
   });
 </script>
 
