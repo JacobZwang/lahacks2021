@@ -8,7 +8,7 @@
     "hooks": {
         "prebuild": {
             "commands": [
-                "echo \"PREBUILD\"",
+                "echo \"STARTING PREBUILD\"",
                 "echo $NAME"
             ]
         }
