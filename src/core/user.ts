@@ -19,11 +19,15 @@ export default class User {
     }
 
     setLocation(tile: Tile) {
-        const self = this;
-        if (this.tileIn) {
-            this.tileIn.removeUser();
+        if (!tile.hasWall && !tile.hasUser) {
+            const self = this;
+
+            if (this.tileIn) {
+                this.tileIn.removeUser();
+            }
+
+            this.tileIn = tile;
+            this.tileIn.addUser(self);
         }
-        this.tileIn = tile;
-        this.tileIn.addUser(self);
     }
 }
