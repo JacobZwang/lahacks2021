@@ -27,9 +27,6 @@ const preprocess = sveltePreprocess({
     includePaths: ["src"],
   },
   sourceMap: true,
-  postcss: {
-    plugins: [require("autoprefixer")],
-  },
 });
 
 export default {
