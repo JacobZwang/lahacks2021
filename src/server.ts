@@ -6,6 +6,8 @@ import http from "http";
 import { Server } from "socket.io";
 import HttpServer from "http";
 
+import templateWalls from "./templates/template-1/walls";
+
 const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === "development";
 
@@ -20,11 +22,15 @@ const httpServer = new HttpServer.Server(app);
 
 const io = new Server(httpServer, {
     cors: {
-        origin: "*",
+        origin: "http://localhost:3000",
     },
 });
 
+const walls = templateWalls;
+
 io.on("connection", (socket) => {
+    socket.emit("set:walls", walls);
+
     console.log("a user connected");
 });
 

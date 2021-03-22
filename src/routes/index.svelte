@@ -7,25 +7,27 @@
 
   import SidePanel from "../components/SidePanel.svelte";
 
-  import templateWalls from "../templates/template-1/walls";
-
-  const socket = io();
-
-  socket.on("connection", () => {
-    console.log("revieved connection from socket");
-  });
-
   let stateManager: StateManager;
+
   onMount(() => {
     stateManager = new StateManager(30, 30);
     stateManager.calculateDistancesFromClient();
 
-    stateManager.tileManager.tiles.forEach((_, i) => {
-      const tile = stateManager.tileManager.tiles[i];
+    const socket = io("http://localhost:3000");
 
-      if (templateWalls.some((j) => j === i)) {
-        tile.addWallAndRecalc();
-      }
+    socket.on("connection", () => {
+      console.log("revieved connection from socket");
+    });
+
+    socket.on("set:walls", (payload) => {
+      console.log(payload);
+      stateManager.tileManager.tiles.forEach((_, i) => {
+        const tile = stateManager.tileManager.tiles[i];
+
+        if (payload.some((j: number) => j === i)) {
+          tile.addWallAndRecalc();
+        }
+      });
     });
   });
 </script>

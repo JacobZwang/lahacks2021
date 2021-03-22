@@ -2,13 +2,15 @@ import TileManager from "./tile-manager";
 import type User from "./user";
 import UserManager from "./user-manager";
 import type Tile from "./tile";
+import type { Socket } from "socket.io-client";
 
 export default class StateManager {
     userManager: UserManager;
     tileManager: TileManager;
     clientUser: User;
+    socket: Socket;
 
-    constructor(width: number, height: number) {
+    constructor(width: number, height: number, socket: Socket) {
         const self = this;
         this.userManager = new UserManager(self);
         this.tileManager = new TileManager(
@@ -17,6 +19,7 @@ export default class StateManager {
             width,
             height
         );
+        this.socket = socket;
 
         for (let i = 0; i < width * height; i++) {
             const tile = this.tileManager.createTile();
