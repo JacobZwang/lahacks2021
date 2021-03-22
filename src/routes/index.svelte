@@ -78,6 +78,7 @@
       });
     }
 
+    /**assigns the neighboring walls to variables on the wall for later use*/
     assignNeigbors(top: Tile, right: Tile, bottom: Tile, left: Tile) {
       this.neigborTop = top;
       this.neigborRight = right;
@@ -85,10 +86,12 @@
       this.neigborLeft = left;
     }
 
+    /**creates outline around tile*/
     outline() {
       this.tile.style.border = "2pt solid black";
     }
 
+    /**appends wall to tile*/
     addWall() {
       const wall = new Wall(this.tile, [
         this.neigborTop.hasWall,
@@ -98,6 +101,7 @@
       ]);
     }
 
+    /**removes wall and readds it to fix rotation when new wall placed*/
     recalculateWall() {
       this.tile.removeChild(this.tile.childNodes[0]);
       this.addWall();
@@ -118,7 +122,6 @@
       this.wall.style.backgroundColor = "grey";
       target.appendChild(this.wall);
 
-      console.log(neighbortWalls);
       if (
         neighbortWalls[0] === false &&
         neighbortWalls[1] === true &&
