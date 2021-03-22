@@ -19,7 +19,7 @@ export default class StateManager {
         }
 
         this.tileManager.tiles.forEach((tile, i) => {
-            tile.assignNeigbors(
+            tile.assignNeighbors(
                 this.tileManager.tiles[i - width],
                 this.tileManager.tiles[i + 1],
                 this.tileManager.tiles[i + width],

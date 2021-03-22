@@ -3,44 +3,56 @@ export default class Wall {
     wall: HTMLDivElement;
     constructor(
         target: HTMLDivElement,
-        neighbortWalls: [boolean, boolean, boolean, boolean]
+        neighborTop: boolean,
+        neighborRight: boolean,
+        neighborBottom: boolean,
+        neighborLeft: boolean,
     ) {
         this.wall = document.createElement("div");
-        this.wall.style.height = "100%";
-        this.wall.style.width = "50%";
-        this.wall.style.margin = "auto";
         this.wall.style.backgroundColor = "grey";
         this.wall.setAttribute("role", "wall");
         target.appendChild(this.wall);
 
         if (
-            neighbortWalls[0] === false &&
-            neighbortWalls[1] === true &&
-            neighbortWalls[2] === false &&
-            neighbortWalls[3] === true
+            neighborTop === false &&
+            neighborBottom === false &&
+            neighborLeft === true &&
+            neighborRight === true
         ) {
             this.wall.style.height = "50%";
             this.wall.style.width = "100%";
-        }
-
-        if (
-            neighbortWalls[0] === false &&
-            neighbortWalls[1] === false &&
-            neighbortWalls[2] === false &&
-            neighbortWalls[3] === true
-        ) {
+            this.wall.style.marginTop = "25%";
+        } else if (
+            neighborTop === true &&
+            neighborBottom === true &&
+            neighborLeft === false &&
+            neighborRight === false) {
+            this.wall.style.height = "100%";
+            this.wall.style.width = "50%";
+            this.wall.style.marginLeft = "25%";
+        } else if (
+            neighborTop === false &&
+            neighborBottom === false &&
+            neighborLeft === true &&
+            neighborRight === false) {
             this.wall.style.height = "50%";
-            this.wall.style.width = "100%";
-        }
-
-        if (
-            neighbortWalls[0] === false &&
-            neighbortWalls[1] === true &&
-            neighbortWalls[2] === false &&
-            neighbortWalls[3] === false
-        ) {
+            this.wall.style.width = "50%";
+            this.wall.style.marginRight = "25%";
+            this.wall.style.marginTop = "25%";
+        } else if (
+            neighborTop === false &&
+            neighborBottom === false &&
+            neighborLeft === true &&
+            neighborRight === false) {
             this.wall.style.height = "50%";
-            this.wall.style.width = "100%";
+            this.wall.style.width = "50%";
+            this.wall.style.marginLeft = "25%";
+            this.wall.style.marginTop = "25%";
+        } else {
+            this.wall.style.height = "50%";
+            this.wall.style.width = "50%";
+            this.wall.style.marginLeft = "25%";
+            this.wall.style.marginTop = "25%";
         }
     }
 }

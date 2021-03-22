@@ -5,16 +5,14 @@ import type TileManager from "./tile-manager";
 /**tile is appended to grid apon creation*/
 export default class Tile {
     tile: HTMLDivElement;
-    hasWall: boolean;
-    neigborTop: Tile;
-    neigborRight: Tile;
-    neigborBottom: Tile;
-    neigborLeft: Tile;
+    neighborTop: Tile;
+    neighborRight: Tile;
+    neighborBottom: Tile;
+    neighborLeft: Tile;
     manager: TileManager;
 
     constructor(manager: TileManager) {
         this.tile = document.createElement("div");
-        this.hasWall = false;
         this.manager = manager;
         this.manager.target.appendChild(this.tile);
 
@@ -22,22 +20,21 @@ export default class Tile {
             if (this.hasWall === false) {
                 this.addWall();
 
-                if (this.neigborTop.hasWall) {
-                    this.neigborTop.recalculateWall();
+                if (this.neighborTop.hasWall) {
+                    this.neighborTop.recalculateWall();
                 }
 
-                if (this.neigborRight.hasWall) {
-                    this.neigborRight.recalculateWall();
+                if (this.neighborRight.hasWall) {
+                    this.neighborRight.recalculateWall();
                 }
 
-                if (this.neigborBottom.hasWall) {
-                    this.neigborBottom.recalculateWall();
+                if (this.neighborBottom.hasWall) {
+                    this.neighborBottom.recalculateWall();
                 }
 
-                if (this.neigborLeft.hasWall) {
-                    this.neigborLeft.recalculateWall();
+                if (this.neighborLeft.hasWall) {
+                    this.neighborLeft.recalculateWall();
                 }
-                this.hasWall = true;
             }
         });
 
@@ -48,11 +45,18 @@ export default class Tile {
     }
 
     /**assigns the neighboring walls to variables on the wall for later use*/
-    assignNeigbors(top: Tile, right: Tile, bottom: Tile, left: Tile) {
-        this.neigborTop = top;
-        this.neigborRight = right;
-        this.neigborBottom = bottom;
-        this.neigborLeft = left;
+    assignNeighbors(top: Tile, right: Tile, bottom: Tile, left: Tile) {
+        this.neighborTop = top;
+        this.neighborRight = right;
+        this.neighborBottom = bottom;
+        this.neighborLeft = left;
+    }
+
+    get hasWall() {
+        if (this.tile.querySelector('[role="wall"]')) {
+            return true
+        }
+        else { return false }
     }
 
     /**creates outline around tile*/
@@ -62,12 +66,12 @@ export default class Tile {
 
     /**appends wall to tile*/
     addWall() {
-        const wall = new Wall(this.tile, [
-            this.neigborTop.hasWall,
-            this.neigborRight.hasWall,
-            this.neigborBottom.hasWall,
-            this.neigborLeft.hasWall,
-        ]);
+        const wall = new Wall(this.tile,
+            this.neighborTop.hasWall,
+            this.neighborRight.hasWall,
+            this.neighborBottom.hasWall,
+            this.neighborLeft.hasWall,
+        );
     }
 
     /**removes wall and readds it to fix rotation when new wall placed*/
