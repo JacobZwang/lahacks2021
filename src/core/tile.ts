@@ -10,6 +10,7 @@ export default class Tile {
     neighborBottom: Tile;
     neighborLeft: Tile;
     manager: TileManager;
+    user?: User;
 
     constructor(manager: TileManager) {
         this.tile = document.createElement("div");
@@ -60,6 +61,14 @@ export default class Tile {
         }
     }
 
+    get hasUser() {
+        if (this.tile.querySelector('[role="user"]')) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**creates outline around tile*/
     outline() {
         this.tile.style.border = "2pt solid black";
@@ -83,10 +92,12 @@ export default class Tile {
     }
 
     addUser(user: User) {
+        this.user = user;
         this.tile.appendChild(user.avatar);
     }
 
     removeUser() {
+        this.user = undefined;
         this.tile.removeChild(this.tile.querySelector('[role="user"]'));
     }
 }

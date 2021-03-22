@@ -12,7 +12,8 @@
   });
 
   onMount(() => {
-    new StateManager(30, 30);
+    const stateManager = new StateManager(30, 30);
+    stateManager.calculateDistancesFromClient();
   });
 </script>
 

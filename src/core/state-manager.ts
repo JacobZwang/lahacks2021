@@ -1,6 +1,7 @@
 import TileManager from "./tile-manager";
 import type User from "./user";
 import UserManager from "./user-manager";
+import type Tile from "./tile";
 
 export default class StateManager {
     userManager: UserManager;
@@ -31,7 +32,21 @@ export default class StateManager {
             );
         });
 
-        const clientUser = this.userManager.createUser({ id: "self" });
-        this.userManager.setActiveUser(clientUser);
+        this.clientUser = this.userManager.createUser({ id: "self" });
+        this.userManager.setActiveUser(this.clientUser);
+    }
+
+    /**calculates the distances all uses are away from the client user*/
+    calculateDistancesFromClient() {
+        const origin = this.clientUser;
+        const tiles = this.tileManager.tiles;
+
+        tiles.forEach((tile: Tile) => {
+            console.log({
+                hasWall: tile.hasWall,
+                hasUser: tile.hasUser,
+                user: tile.user,
+            });
+        });
     }
 }
