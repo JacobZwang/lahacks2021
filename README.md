@@ -14,6 +14,7 @@ docker-compose up --build
 
 With Docker
 ```
+docker build . --no-cache --progress=plain -t lahacks2021 &&
 docker run  -p 8080:8080 --name lahacks2021 lahacks2021
 ```
 
