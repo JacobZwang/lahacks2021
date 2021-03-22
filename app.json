@@ -4,5 +4,13 @@
         "NAME": {
             "description": "LAHacks 2021 TESTING ENV VARIABLE"
         }
+    },
+    "hooks": {
+        "prebuild": {
+            "commands": [
+                "echo \"STARTING PREBUILD\"",
+                "echo $NAME"
+            ]
+        }
     }
 }
