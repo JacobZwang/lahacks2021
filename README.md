@@ -2,8 +2,21 @@
 
 ### Run Instructions
 
+With Docker Compose (recommended)
+```
+docker-compose up --build
+```
+
+With Docker
 ```
 docker run  -p 8080:8080 --name lahacks2021 lahacks2021
+```
+
+With NPM 
+Node 14
+```
+npm install
+npm run dev
 ```
 
 
