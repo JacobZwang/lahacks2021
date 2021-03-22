@@ -8,7 +8,7 @@
     "hooks": {
         "prebuild": {
             "commands": [
-                "./scripts/prebuild.sh"
+                "./lahacks2021/scripts/prebuild.sh"
             ]
         }
     }
