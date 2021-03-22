@@ -1,22 +1,22 @@
 import sirv from 'sirv';
-import polka from 'polka';
+import express from 'express';
 import compression from 'compression';
 import * as sapper from '@sapper/server';
 import http from "http";
 import { Server } from "socket.io";
-import { createServer } from "http";
+import HttpServer from "http";
 
 const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === "development";
 
-const httpServer = createServer();
-const app = polka();
-
+const app = express();
 app.use(
     compression({ threshold: 0 }),
     sirv('static', { dev }),
     sapper.middleware()
 )
+
+const httpServer = new HttpServer.Server(app);
 
 const io = new Server(httpServer, {
     cors: {
