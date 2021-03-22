@@ -1,5 +1,6 @@
 import Wall from "./wall"
 import type User from "./user"
+import type TileManager from "./tile-manager";
 
 /**tile is appended to grid apon creation*/
 export default class Tile {
@@ -9,11 +10,13 @@ export default class Tile {
     neigborRight: Tile;
     neigborBottom: Tile;
     neigborLeft: Tile;
+    manager: TileManager;
 
-    constructor(target: HTMLDivElement) {
+    constructor(manager: TileManager) {
         this.tile = document.createElement("div");
         this.hasWall = false;
-        target.appendChild(this.tile);
+        this.manager = manager;
+        this.manager.target.appendChild(this.tile);
 
         this.tile.addEventListener("click", () => {
             if (this.hasWall === false) {
@@ -37,6 +40,11 @@ export default class Tile {
                 this.hasWall = true;
             }
         });
+
+        this.tile.addEventListener("contextmenu", () => {
+            const self = this;
+            this.manager.manager.userManager.activeUser.setLocation(self)
+        })
     }
 
     /**assigns the neighboring walls to variables on the wall for later use*/
