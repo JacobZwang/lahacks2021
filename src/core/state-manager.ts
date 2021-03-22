@@ -36,17 +36,27 @@ export default class StateManager {
         this.userManager.setActiveUser(this.clientUser);
     }
 
+    getWallsAsJSON() {
+        const walls: number[] = [];
+        this.tileManager.tiles.forEach((tile, i) => {
+            if (tile.hasWall) {
+                walls.push(i);
+            }
+        });
+        console.log(walls.toString());
+    }
+
     /**calculates the distances all uses are away from the client user*/
     calculateDistancesFromClient() {
         const origin = this.clientUser;
         const tiles = this.tileManager.tiles;
 
         tiles.forEach((tile: Tile) => {
-            console.log({
-                hasWall: tile.hasWall,
-                hasUser: tile.hasUser,
-                user: tile.user,
-            });
+            // console.log({
+            //     hasWall: tile.hasWall,
+            //     hasUser: tile.hasUser,
+            //     user: tile.user,
+            // });
         });
     }
 }

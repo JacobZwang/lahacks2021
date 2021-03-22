@@ -18,25 +18,7 @@ export default class Tile {
         this.manager.target.appendChild(this.tile);
 
         this.tile.addEventListener("click", () => {
-            if (this.hasWall === false) {
-                this.addWall();
-
-                if (this.neighborTop.hasWall) {
-                    this.neighborTop.recalculateWall();
-                }
-
-                if (this.neighborRight.hasWall) {
-                    this.neighborRight.recalculateWall();
-                }
-
-                if (this.neighborBottom.hasWall) {
-                    this.neighborBottom.recalculateWall();
-                }
-
-                if (this.neighborLeft.hasWall) {
-                    this.neighborLeft.recalculateWall();
-                }
-            }
+            this.addWallAndRecalc();
         });
 
         this.tile.addEventListener("contextmenu", () => {
@@ -83,6 +65,28 @@ export default class Tile {
             this.neighborBottom.hasWall,
             this.neighborLeft.hasWall
         );
+    }
+
+    addWallAndRecalc() {
+        if (this.hasWall === false) {
+            this.addWall();
+
+            if (this.neighborTop.hasWall) {
+                this.neighborTop.recalculateWall();
+            }
+
+            if (this.neighborRight.hasWall) {
+                this.neighborRight.recalculateWall();
+            }
+
+            if (this.neighborBottom.hasWall) {
+                this.neighborBottom.recalculateWall();
+            }
+
+            if (this.neighborLeft.hasWall) {
+                this.neighborLeft.recalculateWall();
+            }
+        }
     }
 
     /**removes wall and readds it to fix rotation when new wall placed*/

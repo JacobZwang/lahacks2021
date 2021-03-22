@@ -5,18 +5,30 @@
   import TileManager from "../core/tile-manager";
   import UserManager from "../core/user-manager";
 
+  import templateWalls from "../templates/template-1/walls";
+
   const socket = io();
 
   socket.on("connection", () => {
     console.log("revieved connection from socket");
   });
 
+  let stateManager: StateManager;
   onMount(() => {
-    const stateManager = new StateManager(30, 30);
+    stateManager = new StateManager(30, 30);
     stateManager.calculateDistancesFromClient();
+
+    stateManager.tileManager.tiles.forEach((_, i) => {
+      const tile = stateManager.tileManager.tiles[i];
+
+      if (templateWalls.some((j) => j === i)) {
+        tile.addWallAndRecalc();
+      }
+    });
   });
 </script>
 
+<!-- <button on:click={() => stateManager.getWallsAsJSON()}> print walls </button> -->
 <div id="grid" />
 
 <style>
