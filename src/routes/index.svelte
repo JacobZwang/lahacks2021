@@ -18,10 +18,12 @@
       this.target.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
       this.target.style.gridTemplateRows = `repeat(${height}, 1fr)`;
 
+      const margin = 20;
+
       if (window.innerHeight < window.innerWidth) {
         //add math to make fit on screen when it isn't square
-        this.target.style.height = window.innerHeight + "px";
-        this.target.style.width = window.innerHeight + "px";
+        this.target.style.height = window.innerHeight - margin + "px";
+        this.target.style.width = window.innerHeight - margin + "px";
       } else {
         this.target.style.height = window.innerWidth + "px";
         this.target.style.width = window.innerWidth + "px";
@@ -79,13 +81,13 @@
   }
 
   onMount(() => {
-    const width = 10;
-    const height = 10;
+    const width = 30;
+    const height = 30;
 
     const tileManager = new TileManager(
       document.getElementById("grid") as HTMLDivElement,
-      10,
-      10
+      width,
+      height
     );
 
     for (let i = 0; i < width * height; i++) {
