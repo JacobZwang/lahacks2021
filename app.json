@@ -8,7 +8,7 @@
     "hooks": {
         "prebuild": {
             "commands": [
-                "scripts/prebuild.sh"
+                "./prebuild.sh"
             ]
         }
     }
