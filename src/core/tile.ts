@@ -20,21 +20,7 @@ export default class Tile {
         this.tile.addEventListener("contextmenu", () => {
             if (this.hasWall === true) {
                 this.tile.removeChild(this.tile.querySelector('[role="wall"]'));
-                if (this.neighborTop.hasWall) {
-                    this.neighborTop.recalculateWall();
-                }
-    
-                if (this.neighborRight.hasWall) {
-                    this.neighborRight.recalculateWall();
-                }
-    
-                if (this.neighborBottom.hasWall) {
-                    this.neighborBottom.recalculateWall();
-                }
-    
-                if (this.neighborLeft.hasWall) {
-                    this.neighborLeft.recalculateWall();
-                }
+                this.recalcNeighbors();
             }
             else {
                 this.addWallAndRecalc();
@@ -89,25 +75,28 @@ export default class Tile {
         );
     }
 
+    recalcNeighbors() {
+        if (this.neighborTop.hasWall) {
+            this.neighborTop.recalculateWall();
+        }
+
+        if (this.neighborRight.hasWall) {
+            this.neighborRight.recalculateWall();
+        }
+
+        if (this.neighborBottom.hasWall) {
+            this.neighborBottom.recalculateWall();
+        }
+
+        if (this.neighborLeft.hasWall) {
+            this.neighborLeft.recalculateWall();
+        }
+    }
     addWallAndRecalc() {
         if (this.hasWall === false) {
             this.addWall();
 
-            if (this.neighborTop.hasWall) {
-                this.neighborTop.recalculateWall();
-            }
-
-            if (this.neighborRight.hasWall) {
-                this.neighborRight.recalculateWall();
-            }
-
-            if (this.neighborBottom.hasWall) {
-                this.neighborBottom.recalculateWall();
-            }
-
-            if (this.neighborLeft.hasWall) {
-                this.neighborLeft.recalculateWall();
-            }
+            this.recalcNeighbors();
         }
     }
 
