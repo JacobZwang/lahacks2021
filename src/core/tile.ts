@@ -24,6 +24,7 @@ export default class Tile {
         this.tile.addEventListener("click", () => {
             const self = this;
             this.manager.manager.userManager.activeUser.setLocation(self);
+            this.manager.manager.emitUser(this.user);
         });
     }
 

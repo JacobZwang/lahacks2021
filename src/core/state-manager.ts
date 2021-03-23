@@ -35,8 +35,23 @@ export default class StateManager {
             );
         });
 
-        this.clientUser = this.userManager.createUser({ id: "self" });
+        this.clientUser = this.userManager.createUser({ id: this.socket.id });
         this.userManager.setActiveUser(this.clientUser);
+
+        socket.on("set:walls", (payload) => {
+            console.log(payload);
+            this.tileManager.tiles.forEach((_, i) => {
+                const tile = this.tileManager.tiles[i];
+
+                if (payload.some((j: number) => j === i)) {
+                    tile.addWallAndRecalc();
+                }
+            });
+        });
+
+        socket.on("set:user", (payload) => {
+            this.userManager.setUser(payload);
+        });
     }
 
     getWallsAsJSON() {
@@ -60,6 +75,13 @@ export default class StateManager {
             //     hasUser: tile.hasUser,
             //     user: tile.user,
             // });
+        });
+    }
+
+    emitUser(user: User) {
+        this.socket.emit("set:user", {
+            id: this.socket.id,
+            location: this.tileManager.tiles.indexOf(user.tileIn),
         });
     }
 }

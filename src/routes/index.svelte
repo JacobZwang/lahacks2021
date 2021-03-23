@@ -10,24 +10,13 @@
   let stateManager: StateManager;
 
   onMount(() => {
-    stateManager = new StateManager(30, 30);
-    stateManager.calculateDistancesFromClient();
+    const socket = io();
 
-    const socket = io("http://localhost:3000");
+    stateManager = new StateManager(30, 30, socket);
+    stateManager.calculateDistancesFromClient();
 
     socket.on("connection", () => {
       console.log("revieved connection from socket");
-    });
-
-    socket.on("set:walls", (payload) => {
-      console.log(payload);
-      stateManager.tileManager.tiles.forEach((_, i) => {
-        const tile = stateManager.tileManager.tiles[i];
-
-        if (payload.some((j: number) => j === i)) {
-          tile.addWallAndRecalc();
-        }
-      });
     });
   });
 </script>

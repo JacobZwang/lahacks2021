@@ -22,16 +22,21 @@ const httpServer = new HttpServer.Server(app);
 
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "*",
     },
 });
 
 const walls = templateWalls;
 
 io.on("connection", (socket) => {
+    console.log("a user connected");
+
     socket.emit("set:walls", walls);
 
-    console.log("a user connected");
+    socket.on("set:user", (payload) => {
+        console.log(payload);
+        socket.broadcast.emit("set:user", payload);
+    });
 });
 
 httpServer.listen(PORT, () => {
