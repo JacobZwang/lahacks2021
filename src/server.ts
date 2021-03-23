@@ -27,14 +27,28 @@ const io = new Server(httpServer, {
 });
 
 const walls = templateWalls;
+const users = new Map();
 
 io.on("connection", (socket) => {
     console.log("a user connected");
 
     socket.emit("set:walls", walls);
 
+    users.forEach((user) => {
+        socket.emit("set:user", user);
+    });
+
     socket.on("set:user", (payload) => {
         console.log(payload);
+
+        const user = users.get(payload.id);
+
+        if (user) {
+            user.location = payload.location;
+        } else {
+            users.set(payload.id, payload);
+        }
+
         socket.broadcast.emit("set:user", payload);
     });
 });
