@@ -20,6 +20,21 @@ export default class Tile {
         this.tile.addEventListener("contextmenu", () => {
             if (this.hasWall === true) {
                 this.tile.removeChild(this.tile.querySelector('[role="wall"]'));
+                if (this.neighborTop.hasWall) {
+                    this.neighborTop.recalculateWall();
+                }
+    
+                if (this.neighborRight.hasWall) {
+                    this.neighborRight.recalculateWall();
+                }
+    
+                if (this.neighborBottom.hasWall) {
+                    this.neighborBottom.recalculateWall();
+                }
+    
+                if (this.neighborLeft.hasWall) {
+                    this.neighborLeft.recalculateWall();
+                }
             }
             else {
                 this.addWallAndRecalc();
