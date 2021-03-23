@@ -10,52 +10,41 @@ export default class Wall {
     ) {
         this.wall = document.createElement("div");
         this.wall.style.backgroundColor = "grey";
+
+        if(neighborBottom && neighborRight) {
+            this.wall.style.clipPath ="polygon(0% 0%, 101% 0%, 101% 50%, 50% 50%, 50% 101%, 0% 101%)";
+
+        }
+
+        this.wall.style.height =
+            50 +
+            50 * ((neighborBottom||neighborTop) && (!(neighborTop && (neighborLeft || neighborRight))||(neighborTop && neighborBottom)) ? 1 : 0) +
+            "%";
+            this.wall.style.width =
+            50 +
+            50 * ((neighborLeft || neighborRight) && (!(neighborLeft && (neighborTop || neighborBottom))||(neighborLeft && neighborRight))? 1 : 0) +
+            "%";
+
+        
+        
+            
+        this.addBorderRadius(neighborBottom, neighborLeft, neighborRight, neighborTop);
         this.wall.setAttribute("role", "wall");
         target.appendChild(this.wall);
+    }
 
-        if (
-            neighborTop === false &&
-            neighborBottom === false &&
-            neighborLeft === true &&
-            neighborRight === true
-        ) {
-            this.wall.style.height = "50%";
-            this.wall.style.width = "100%";
-            this.wall.style.marginTop = "25%";
-        } else if (
-            neighborTop === true &&
-            neighborBottom === true &&
-            neighborLeft === false &&
-            neighborRight === false
-        ) {
-            this.wall.style.height = "100%";
-            this.wall.style.width = "50%";
-            this.wall.style.marginLeft = "25%";
-        } else if (
-            neighborTop === false &&
-            neighborBottom === false &&
-            neighborLeft === true &&
-            neighborRight === false
-        ) {
-            this.wall.style.height = "50%";
-            this.wall.style.width = "50%";
-            this.wall.style.marginRight = "25%";
-            this.wall.style.marginTop = "25%";
-        } else if (
-            neighborTop === false &&
-            neighborBottom === false &&
-            neighborLeft === true &&
-            neighborRight === false
-        ) {
-            this.wall.style.height = "50%";
-            this.wall.style.width = "50%";
-            this.wall.style.marginLeft = "25%";
-            this.wall.style.marginTop = "25%";
-        } else {
-            this.wall.style.height = "50%";
-            this.wall.style.width = "50%";
-            this.wall.style.marginLeft = "25%";
-            this.wall.style.marginTop = "25%";
+    private addBorderRadius(neighborBottom: boolean, neighborLeft: boolean, neighborRight: boolean, neighborTop: boolean) {
+        if (!neighborBottom && !neighborLeft) {
+            this.wall.style.borderBottomLeftRadius = "2px";
+        }
+        if (!neighborBottom && !neighborRight) {
+            this.wall.style.borderBottomRightRadius = "2px";
+        }
+        if (!neighborTop && !neighborLeft) {
+            this.wall.style.borderTopLeftRadius = "2px";
+        }
+        if (!neighborTop && !neighborRight) {
+            this.wall.style.borderTopRightRadius = "2px";
         }
     }
 }
