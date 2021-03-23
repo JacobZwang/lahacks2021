@@ -12,7 +12,7 @@ export default class Wall {
         this.wall.style.backgroundColor = "grey";
 
         if(neighborBottom && neighborRight) {
-            this.wall.style.clipPath ="polygon(0% 0%, 101% 0%, 101% 50%, 50% 50%, 50% 101%, 0% 101%)";
+            this.wall.style.clipPath ="polygon(-1% -1%, 101% -1%, 101% 50%, 50% 50%, 50% 101%, -1% 101%)";
 
         }
 
