@@ -34,4 +34,9 @@ export default class UserManager {
             user.setLocation(this.manager.tileManager.tiles[payload.location]);
         }
     }
+
+    deleteUser(id: string) {
+        this.users.get(id).tileIn.removeUser();
+        this.users.delete(id);
+    }
 }

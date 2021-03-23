@@ -52,6 +52,10 @@ export default class StateManager {
         socket.on("set:user", (payload) => {
             this.userManager.setUser(payload);
         });
+
+        socket.on("del:user", (id) => {
+            this.userManager.deleteUser(id);
+        });
     }
 
     getWallsAsJSON() {

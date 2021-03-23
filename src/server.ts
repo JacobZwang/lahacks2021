@@ -51,6 +51,11 @@ io.on("connection", (socket) => {
 
         socket.broadcast.emit("set:user", payload);
     });
+
+    socket.on("disconnect", () => {
+        users.delete(socket.id);
+        socket.broadcast.emit("del:user", socket.id);
+    });
 });
 
 httpServer.listen(PORT, () => {
