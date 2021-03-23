@@ -19,6 +19,7 @@ export default class Tile {
 
         this.tile.addEventListener("contextmenu", () => {
             this.addWallAndRecalc();
+            this.manager.manager.emitWall(this);
         });
 
         this.tile.addEventListener("click", () => {

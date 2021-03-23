@@ -38,9 +38,12 @@ io.on("connection", (socket) => {
         socket.emit("set:user", user);
     });
 
-    socket.on("set:user", (payload) => {
-        console.log(payload);
+    socket.on("set:wall", (payload) => {
+        walls.push(payload);
+        socket.broadcast.emit("set:wall", payload);
+    });
 
+    socket.on("set:user", (payload) => {
         const user = users.get(payload.id);
 
         if (user) {

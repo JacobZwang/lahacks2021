@@ -56,6 +56,10 @@ export default class StateManager {
         socket.on("del:user", (id) => {
             this.userManager.deleteUser(id);
         });
+
+        socket.on("set:wall", (payload) => {
+            this.tileManager.tiles[payload].addWallAndRecalc();
+        });
     }
 
     getWallsAsJSON() {
@@ -87,5 +91,9 @@ export default class StateManager {
             id: this.socket.id,
             location: this.tileManager.tiles.indexOf(user.tileIn),
         });
+    }
+
+    emitWall(tile: Tile) {
+        this.socket.emit("set:wall", this.tileManager.tiles.indexOf(tile));
     }
 }
