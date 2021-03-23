@@ -18,7 +18,12 @@ export default class Tile {
         this.manager.target.appendChild(this.tile);
 
         this.tile.addEventListener("contextmenu", () => {
-            this.addWallAndRecalc();
+            if (this.hasWall === true) {
+                this.tile.removeChild(this.tile.querySelector('[role="wall"]'));
+            }
+            else {
+                this.addWallAndRecalc();
+            }
             this.manager.manager.emitWall(this);
         });
 
