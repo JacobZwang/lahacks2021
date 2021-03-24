@@ -13,7 +13,6 @@
     const socket = io();
 
     stateManager = new StateManager(30, 30, socket);
-    stateManager.calculateDistancesFromClient();
 
     socket.on("connection", () => {
       console.log("revieved connection from socket");

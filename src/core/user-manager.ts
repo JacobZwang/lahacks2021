@@ -29,10 +29,10 @@ export default class UserManager {
         if (user) {
             user.setLocation(this.manager.tileManager.tiles[payload.location]);
         } else {
-            console.log(payload);
             const user = this.createUser(payload);
             user.setLocation(this.manager.tileManager.tiles[payload.location]);
         }
+
     }
 
     deleteUser(id: string) {

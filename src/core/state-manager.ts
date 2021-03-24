@@ -3,6 +3,7 @@ import type User from "./user";
 import UserManager from "./user-manager";
 import type Tile from "./tile";
 import type { Socket } from "socket.io-client";
+// import { userInfo } from "node:os";
 
 export default class StateManager {
     userManager: UserManager;
@@ -74,16 +75,73 @@ export default class StateManager {
 
     /**calculates the distances all uses are away from the client user*/
     calculateDistancesFromClient() {
-        const origin = this.clientUser;
-        const tiles = this.tileManager.tiles;
+        class Vertex{
+            tileId: number;
+            distancefromuser: number;
+            heuristicdistance: number;
+            fvalue: number;
+            previous: number;
 
-        tiles.forEach((tile: Tile) => {
-            // console.log({
-            //     hasWall: tile.hasWall,
-            //     hasUser: tile.hasUser,
-            //     user: tile.user,
-            // });
-        });
+            constructor(tileId: number, heuristicdistance: number, previous: number ){
+                this.tileId = tileId;
+                this.distancefromuser = 1
+                this.heuristicdistance = heuristicdistance
+                this.fvalue = this.heuristicdistance + this.distancefromuser
+                this.previous = previous
+            }
+        }
+        
+        
+        
+        
+        let users = this.userManager.users
+
+        for (let k of users.keys()) {
+            if (k == undefined)
+              users.delete(k);
+          }
+    if(users != undefined){
+        users.forEach((user) =>{
+        let openList = []
+        const closedList = []
+        const ledger = []
+        const userx = this.tileManager.tiles.indexOf(user.tileIn) % this.tileManager.width 
+        const usery = this.tileManager.tiles.indexOf(user.tileIn) / this.tileManager.width
+        console.log(this.clientUser.tileIn)
+        openList.push(this.clientUser.tileIn)
+        while(openList.length > 0){
+            const possibilities = [openList[0].neighborTop, openList[0].neighborBottom, openList[0].neighborRight, openList[0].neighborLeft]
+            for(var i = 0; i < possibilities.length; i++){
+                if(possibilities[i].hasWall != true){
+                    const x = this.tileManager.tiles.indexOf(possibilities[i]) % this.tileManager.width
+                    const y = this.tileManager.tiles.indexOf(possibilities[i]) / this.tileManager.width
+
+                    const tileId = this.tileManager.tiles.indexOf(possibilities[i])
+                    const heuristicdistance = Math.sqrt(Math.pow(x-userx, 2) + Math.pow(y-usery, 2))
+                    const previous = this.tileManager.tiles.indexOf(openList[0])
+
+                    const vertex = new Vertex(tileId, heuristicdistance, previous)
+
+                    ledger.push(vertex)
+                }
+
+                
+            }
+            ledger.sort((a, b) => {
+                return a.fvalue - b.fvalue;
+            })
+
+            console.log(ledger[0])
+
+            openList = []
+            
+        }})
+    }
+        // return "no possible paths"
+
+        //Initializing the open/closed lists 
+
+       
     }
 
     emitUser(user: User) {
@@ -97,3 +155,6 @@ export default class StateManager {
         this.socket.emit("set:wall", this.tileManager.tiles.indexOf(tile));
     }
 }
+
+
+

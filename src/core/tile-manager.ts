@@ -6,6 +6,7 @@ export default class TileManager {
     tiles: Tile[];
     target: HTMLDivElement;
     manager: StateManager;
+    width: number;
 
     constructor(
         manager: StateManager,
@@ -16,6 +17,8 @@ export default class TileManager {
         this.target = target;
         this.target.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
         this.target.style.gridTemplateRows = `repeat(${height}, 1fr)`;
+
+        this.width = width
 
         const margin = 20;
 

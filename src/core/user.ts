@@ -28,6 +28,9 @@ export default class User {
 
             this.tileIn = tile;
             this.tileIn.addUser(self);
+
+            this.userManager.manager.calculateDistancesFromClient()
+            
         }
     }
 }
