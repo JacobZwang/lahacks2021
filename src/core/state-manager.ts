@@ -101,18 +101,22 @@ export default class StateManager {
             distancefromuser: number;
             heuristicdistance: number;
             fvalue: number;
-            previous: number;
+            tile: Tile
+            previousTile: Vertex
+
 
             constructor(
                 tileId: number,
                 heuristicdistance: number,
-                previous: number
+                tile: Tile,
+                previousTile: Vertex
             ) {
                 this.tileId = tileId;
                 this.distancefromuser = 1;
                 this.heuristicdistance = heuristicdistance;
                 this.fvalue = this.heuristicdistance + this.distancefromuser;
-                this.previous = previous;
+                this.tile = tile
+                this.previousTile = previousTile
             }
         }
 
@@ -123,24 +127,26 @@ export default class StateManager {
         }
         if (users != undefined) {
             users.forEach((user) => {
-                let openList = [];
-                const closedList = [];
-                const ledger = [];
+                let openList: Array<Vertex> = [];
+                const closedList: Array<Vertex> = [];
                 const userx =
                     this.tileManager.tiles.indexOf(user.tileIn) %
                     this.tileManager.width;
                 const usery =
                     this.tileManager.tiles.indexOf(user.tileIn) /
                     this.tileManager.width;
-                console.log(this.clientUser.tileIn);
-                openList.push(this.clientUser.tileIn);
+                let origon = new Vertex(this.tileManager.tiles.indexOf(this.clientUser.tileIn), 0,this.clientUser.tileIn, null) 
+                console.log(origon);
+                openList.push(origon);
                 while (openList.length > 0) {
                     const possibilities = [
-                        openList[0].neighborTop,
-                        openList[0].neighborBottom,
-                        openList[0].neighborRight,
-                        openList[0].neighborLeft,
+                        openList[0].tile.neighborTop,
+                        openList[0].tile.neighborBottom,
+                        openList[0].tile.neighborRight,
+                        openList[0].tile.neighborLeft,
                     ];
+                    const childNodes: Array<Vertex> = [];
+
                     for (var i = 0; i < possibilities.length; i++) {
                         if (possibilities[i].hasWall != true) {
                             const x =
@@ -158,25 +164,32 @@ export default class StateManager {
                             const heuristicdistance = Math.sqrt(
                                 Math.pow(x - userx, 2) + Math.pow(y - usery, 2)
                             );
-                            const previous = this.tileManager.tiles.indexOf(
-                                openList[0]
-                            );
+                           
+                            const tile = possibilities[i]
+
+                            const previousTile = openList[0]
 
                             const vertex = new Vertex(
                                 tileId,
                                 heuristicdistance,
-                                previous
+                                tile,
+                                previousTile
                             );
 
-                            ledger.push(vertex);
+                            childNodes.push(vertex);
                         }
                     }
-                    ledger.sort((a, b) => {
+                    closedList.push(openList[0])
+                    openList.shift()
+                    childNodes.sort((a, b) => {
                         return a.fvalue - b.fvalue;
                     });
 
-                    console.log(ledger[0]);
+                    childNodes.forEach((child) =>{
+                        openList.push(child)
+                    })
 
+                    console.log(openList[0])
                     openList = [];
                 }
             });
