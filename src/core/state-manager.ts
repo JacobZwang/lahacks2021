@@ -3,12 +3,15 @@ import type User from "./user";
 import UserManager from "./user-manager";
 import type Tile from "./tile";
 import type { Socket } from "socket.io-client";
+import RTCManager from "./rtc-manager";
 
 export default class StateManager {
     userManager: UserManager;
     tileManager: TileManager;
     clientUser: User;
     socket: Socket;
+    video: HTMLVideoElement;
+    RTCManager: RTCManager;
 
     constructor(width: number, height: number, socket: Socket) {
         const self = this;
@@ -20,6 +23,7 @@ export default class StateManager {
             height
         );
         this.socket = socket;
+        this.RTCManager = new RTCManager(socket);
 
         for (let i = 0; i < width * height; i++) {
             const tile = this.tileManager.createTile();
@@ -39,7 +43,6 @@ export default class StateManager {
         this.userManager.setActiveUser(this.clientUser);
 
         socket.on("set:walls", (payload) => {
-            console.log(payload);
             this.tileManager.tiles.forEach((_, i) => {
                 const tile = this.tileManager.tiles[i];
 

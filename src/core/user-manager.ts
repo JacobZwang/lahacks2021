@@ -36,7 +36,7 @@ export default class UserManager {
     }
 
     deleteUser(id: string) {
-        this.users.get(id).tileIn.removeUser();
+        this.users.get(id)?.tileIn.removeUser();
         this.users.delete(id);
     }
 }

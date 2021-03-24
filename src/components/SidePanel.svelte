@@ -19,6 +19,7 @@
       {wallsOutput}
     </div>
   {/if}
+  <video id="self-video" playsinline autoplay muted />
 </div>
 
 <style>
