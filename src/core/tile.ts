@@ -19,13 +19,13 @@ export default class Tile {
 
         this.tile.addEventListener("contextmenu", () => {
             if (this.hasWall === true) {
-                this.tile.removeChild(this.tile.querySelector('[role="wall"]'));
+                this.removeWall();
                 this.recalcNeighbors();
-            }
-            else {
+                this.manager.manager.emitRemoveWall(this);
+            } else {
                 this.addWallAndRecalc();
+                this.manager.manager.emitWall(this);
             }
-            this.manager.manager.emitWall(this);
         });
 
         this.tile.addEventListener("click", () => {
@@ -75,6 +75,10 @@ export default class Tile {
         );
     }
 
+    removeWall() {
+        this.tile.removeChild(this.tile.querySelector('[role="wall"]'));
+    }
+
     recalcNeighbors() {
         if (this.neighborTop.hasWall) {
             this.neighborTop.recalculateWall();
@@ -92,15 +96,15 @@ export default class Tile {
             this.neighborLeft.recalculateWall();
         }
     }
+
     addWallAndRecalc() {
         if (this.hasWall === false) {
             this.addWall();
-
             this.recalcNeighbors();
         }
     }
 
-    /**removes wall and readds it to fix rotation when new wall placed*/
+    /**removes wall and re-adds it to fix rotation when new wall placed*/
     recalculateWall() {
         this.tile.removeChild(this.tile.querySelector('[role="wall"]'));
         this.addWall();

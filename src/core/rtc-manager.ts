@@ -67,7 +67,6 @@ export default class RTCManager {
             document.getElementById("side-panel").appendChild(newVideo);
 
             connections.get(payload.id).ontrack = (e) => {
-                console.log(e);
                 newVideo.srcObject = e.streams[0];
             };
 
@@ -83,8 +82,6 @@ export default class RTCManager {
             stream.getTracks().forEach((track: MediaStreamTrack) => {
                 connections.get(payload.id).addTrack(track, stream);
             });
-
-            console.log(payload.description);
 
             connections
                 .get(payload.id)
@@ -107,7 +104,6 @@ export default class RTCManager {
             document.getElementById("side-panel").appendChild(newVideo);
 
             connections.get(payload.id).ontrack = (e) => {
-                console.log(e);
                 newVideo.srcObject = e.streams[0];
             };
 
@@ -126,14 +122,12 @@ export default class RTCManager {
         });
 
         socket.on("rtc:candidate", (payload) => {
-            // console.log("candidate", payload);
             connections
                 .get(payload.id)
                 .addIceCandidate(new RTCIceCandidate(payload.candidate));
         });
 
         socket.on("rtc:answer", (payload) => {
-            // console.log("answer", payload);
             console.log(connections);
             connections
                 .get(payload.id)

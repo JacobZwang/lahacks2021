@@ -26,13 +26,13 @@ const io = new Server(httpServer, {
     },
 });
 
-const walls = templateWalls;
+const walls = new Set(templateWalls);
 const users = new Map();
 const RTCBroadcasts = new Map();
 const RTCListeners = new Map();
 
 io.on("connection", (socket) => {
-    socket.emit("set:walls", walls);
+    socket.emit("set:walls", Array.from(walls));
 
     const rtcConnections = new Map();
 
@@ -41,8 +41,13 @@ io.on("connection", (socket) => {
     });
 
     socket.on("set:wall", (payload) => {
-        walls.push(payload);
+        walls.add(payload);
         socket.broadcast.emit("set:wall", payload);
+    });
+
+    socket.on("del:wall", (payload) => {
+        walls.delete(payload);
+        socket.broadcast.emit("del:wall", payload);
     });
 
     socket.on("set:user", (payload) => {
@@ -57,16 +62,12 @@ io.on("connection", (socket) => {
 
         socket.broadcast.emit("set:user", payload);
 
-        console.log(users);
-        console.log(rtcConnections);
-
         users.forEach((i) => {
             if (
                 rtcConnections.get(i.id) === undefined &&
                 i.location !== undefined &&
                 i.id !== socket.id
             ) {
-                console.log(user);
                 socket.to(i.id).emit("rtc:new", { id: socket.id });
                 rtcConnections.set(payload.id, true);
             }
@@ -98,7 +99,6 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", () => {
-        console.log("test");
         users.delete(socket.id);
         io.emit("del:user", { id: socket.id });
         io.emit("del:video");
