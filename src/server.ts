@@ -28,11 +28,13 @@ const io = new Server(httpServer, {
 
 const walls = templateWalls;
 const users = new Map();
+const RTCBroadcasts = new Map();
+const RTCListeners = new Map();
 
 io.on("connection", (socket) => {
-    console.log("a user connected");
-
     socket.emit("set:walls", walls);
+
+    const rtcConnections = new Map();
 
     users.forEach((user) => {
         socket.emit("set:user", user);
@@ -50,14 +52,56 @@ io.on("connection", (socket) => {
             user.location = payload.location;
         } else {
             users.set(payload.id, payload);
+            rtcConnections.set(payload.id, false);
         }
 
         socket.broadcast.emit("set:user", payload);
+
+        console.log(users);
+        console.log(rtcConnections);
+
+        users.forEach((i) => {
+            if (
+                rtcConnections.get(i.id) === undefined &&
+                i.location !== undefined &&
+                i.id !== socket.id
+            ) {
+                console.log(user);
+                socket.to(i.id).emit("rtc:new", { id: socket.id });
+                rtcConnections.set(payload.id, true);
+            }
+        });
+    });
+
+    socket.on("rtc:offer", (payload) => {
+        socket.to(payload.id).emit("rtc:offer", {
+            id: socket.id,
+            description: payload.description,
+        });
+        rtcConnections.set(payload.id, true);
+    });
+
+    socket.on("rtc:candidate", (payload) => {
+        socket.to(payload.id).emit("rtc:candidate", {
+            id: socket.id,
+            candidate: payload.candidate,
+        });
+        rtcConnections.set(payload.id, true);
+    });
+
+    socket.on("rtc:answer", (payload) => {
+        socket.to(payload.id).emit("rtc:answer", {
+            id: socket.id,
+            description: payload.description,
+        });
+        rtcConnections.set(payload.id, true);
     });
 
     socket.on("disconnect", () => {
+        console.log("test");
         users.delete(socket.id);
-        socket.broadcast.emit("del:user", socket.id);
+        io.emit("del:user", { id: socket.id });
+        io.emit("del:video");
     });
 });
 
