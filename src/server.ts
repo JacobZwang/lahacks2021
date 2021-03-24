@@ -73,11 +73,6 @@ io.on("connection", (socket) => {
         });
     });
 
-    socket.on("disconnect", () => {
-        users.delete(socket.id);
-        socket.broadcast.emit("del:user", { id: socket.id });
-    });
-
     socket.on("rtc:offer", (payload) => {
         socket.to(payload.id).emit("rtc:offer", {
             id: socket.id,
@@ -100,6 +95,13 @@ io.on("connection", (socket) => {
             description: payload.description,
         });
         rtcConnections.set(payload.id, true);
+    });
+
+    socket.on("disconnect", () => {
+        console.log("test");
+        users.delete(socket.id);
+        io.emit("del:user", { id: socket.id });
+        io.emit("del:video");
     });
 });
 

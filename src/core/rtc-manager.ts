@@ -70,6 +70,10 @@ export default class RTCManager {
                 console.log(e);
                 newVideo.srcObject = e.streams[0];
             };
+
+            socket.on("del:video", () => {
+                document.getElementById("side-panel").removeChild(newVideo);
+            });
         });
 
         socket.on("rtc:offer", (payload) => {
@@ -115,6 +119,10 @@ export default class RTCManager {
                     });
                 }
             };
+
+            socket.on("del:video", () => {
+                document.getElementById("side-panel").removeChild(newVideo);
+            });
         });
 
         socket.on("rtc:candidate", (payload) => {
