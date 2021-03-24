@@ -2,6 +2,8 @@ import Wall from "./wall";
 import type User from "./user";
 import type TileManager from "./tile-manager";
 
+let leftMouseDown = false;
+
 /**tile is appended to grid apon creation*/
 export default class Tile {
     tile: HTMLDivElement;
@@ -26,6 +28,24 @@ export default class Tile {
                 this.addWallAndRecalc();
                 this.manager.manager.emitWall(this);
             }
+        });
+
+        const updateTile = () => {
+            if (dragging === true) {
+                if (this.hasWall === true) {
+                    this.removeWall();
+                    this.recalcNeighbors();
+                    this.manager.manager.emitRemoveWall(this);
+                } else {
+                    this.addWallAndRecalc();
+                    this.manager.manager.emitWall(this);
+                }
+            }
+        };
+
+        this.tile.addEventListener("mouseover", () => {
+            console.log(dragging);
+            updateTile();
         });
 
         this.tile.addEventListener("click", () => {

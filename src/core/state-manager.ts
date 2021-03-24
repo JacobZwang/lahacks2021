@@ -12,6 +12,7 @@ export default class StateManager {
     socket: Socket;
     video: HTMLVideoElement;
     RTCManager: RTCManager;
+    leftMousedown: boolean;
 
     constructor(width: number, height: number, socket: Socket) {
         const self = this;
@@ -24,6 +25,7 @@ export default class StateManager {
         );
         this.socket = socket;
         this.RTCManager = new RTCManager(socket);
+        this.leftMousedown = false;
 
         for (let i = 0; i < width * height; i++) {
             const tile = this.tileManager.createTile();
@@ -41,6 +43,19 @@ export default class StateManager {
 
         this.clientUser = this.userManager.createUser({ id: this.socket.id });
         this.userManager.setActiveUser(this.clientUser);
+
+        document.addEventListener("mousedown", (e) => {
+            if (e.button === 2) {
+                this.leftMousedown = true;
+
+                function mouseup() {
+                    this.leftMousedown = false;
+                    document.removeEventListener("mouseup", mouseup);
+                }
+
+                document.addEventListener("mouseup", mouseup);
+            }
+        });
 
         socket.on("set:walls", (payload) => {
             this.tileManager.tiles.forEach((_, i) => {

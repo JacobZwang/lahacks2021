@@ -12,6 +12,34 @@
     <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
     <link rel="icon" type="image/png" href="favicon.png">
 
+    <script>
+        let dragging = false;
+        const delta = 6;
+        let startX;
+        let startY;
+
+        function isDragging(event) {
+            const diffX = Math.abs(event.pageX - startX);
+            const diffY = Math.abs(event.pageY - startY);
+
+            if (diffX < delta && diffY < delta) {
+                dragging = true;
+            }
+        }
+
+        document.addEventListener('mousedown', function (event) {
+            startX = event.pageX;
+            startY = event.pageY;
+
+            document.addEventListener('mousemove', isDragging);
+        });
+
+        document.addEventListener("mouseup", function (event) {
+            dragging = false;
+            document.removeEventListener("mousemove", isDragging)
+        })
+    </script>
+
     <!-- Sapper creates a <script> tag containing `src/client.js`
 	     and anything else it needs to hydrate the app and
 	     initialise the router -->
