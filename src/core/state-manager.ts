@@ -101,9 +101,8 @@ export default class StateManager {
             distancefromuser: number;
             heuristicdistance: number;
             fvalue: number;
-            tile: Tile
-            previousTile: Vertex
-
+            tile: Tile;
+            previousTile: Vertex;
 
             constructor(
                 tileId: number,
@@ -112,11 +111,14 @@ export default class StateManager {
                 previousTile: Vertex
             ) {
                 this.tileId = tileId;
-                this.distancefromuser = 1;
+                this.distancefromuser =
+                    this.previousTile != null
+                        ? this.previousTile.distancefromuser + 1
+                        : 0;
                 this.heuristicdistance = heuristicdistance;
                 this.fvalue = this.heuristicdistance + this.distancefromuser;
-                this.tile = tile
-                this.previousTile = previousTile
+                this.tile = tile;
+                this.previousTile = previousTile;
             }
         }
 
@@ -125,20 +127,26 @@ export default class StateManager {
         for (let k of users.keys()) {
             if (k == undefined) users.delete(k);
         }
+
         if (users != undefined) {
             users.forEach((user) => {
                 let openList: Array<Vertex> = [];
                 const closedList: Array<Vertex> = [];
+
                 const userx =
                     this.tileManager.tiles.indexOf(user.tileIn) %
                     this.tileManager.width;
                 const usery =
                     this.tileManager.tiles.indexOf(user.tileIn) /
                     this.tileManager.width;
-                let origon = new Vertex(this.tileManager.tiles.indexOf(this.clientUser.tileIn), 0,this.clientUser.tileIn, null) 
-                console.log(origon);
+                let origon = new Vertex(
+                    this.tileManager.tiles.indexOf(this.clientUser.tileIn),
+                    0,
+                    this.clientUser.tileIn,
+                    null
+                );
                 openList.push(origon);
-                while (openList.length > 0) {
+                while (openList != []) {
                     const possibilities = [
                         openList[0].tile.neighborTop,
                         openList[0].tile.neighborBottom,
@@ -164,10 +172,16 @@ export default class StateManager {
                             const heuristicdistance = Math.sqrt(
                                 Math.pow(x - userx, 2) + Math.pow(y - usery, 2)
                             );
-                           
-                            const tile = possibilities[i]
 
-                            const previousTile = openList[0]
+                            const tile = possibilities[i];
+                            
+                            closedList.push(openList[0]);
+                            openList.shift();
+
+                            const previousTile = closedList.slice(-1)[0];
+
+                            // console.log(previousTile)
+
 
                             const vertex = new Vertex(
                                 tileId,
@@ -179,18 +193,38 @@ export default class StateManager {
                             childNodes.push(vertex);
                         }
                     }
-                    closedList.push(openList[0])
-                    openList.shift()
+
                     childNodes.sort((a, b) => {
                         return a.fvalue - b.fvalue;
                     });
-
-                    childNodes.forEach((child) =>{
-                        openList.push(child)
-                    })
-
-                    console.log(openList[0])
-                    openList = [];
+                    
+                    for(var i = 0; i < childNodes.length; i++){
+                        if (
+                            Math.floor(childNodes[i].heuristicdistance) <= 1
+                        ) {
+                             console.log(childNodes[i]);
+                             console.log(openList)
+                             console.log(closedList)
+                             openList = []
+                             break
+                        } else if (openList.includes(childNodes[i])) {
+                            if (
+                                openList[openList.indexOf(childNodes[i])].fvalue <
+                                childNodes[i].fvalue
+                            ) {
+                                openList.splice(openList.indexOf(childNodes[i]), 1);
+                            }
+                        } else if (closedList.includes(childNodes[i])) {
+                            if (
+                                closedList[closedList.indexOf(childNodes[i])].fvalue <
+                                childNodes[i].fvalue
+                            ) {
+                                closedList.splice(closedList.indexOf(childNodes[i]), 1);
+                            }
+                        } else {
+                            openList.push(childNodes[i]);
+                        }
+                    }
                 }
             });
         }
