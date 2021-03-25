@@ -114,7 +114,7 @@ export default class StateManager {
                 this.distancefromuser =
                     this.previousTile != null
                         ? this.previousTile.distancefromuser + 1
-                        : 0;
+                        : 1;
                 this.heuristicdistance = heuristicdistance;
                 this.fvalue = this.heuristicdistance + this.distancefromuser;
                 this.tile = tile;
@@ -131,7 +131,7 @@ export default class StateManager {
         if (users != undefined) {
             users.forEach((user) => {
                 let openList: Array<Vertex> = [];
-                const closedList: Array<Vertex> = [];
+                let closedList: Array<Vertex> = [];
 
                 const userx =
                     this.tileManager.tiles.indexOf(user.tileIn) %
@@ -139,21 +139,30 @@ export default class StateManager {
                 const usery =
                     this.tileManager.tiles.indexOf(user.tileIn) /
                     this.tileManager.width;
-                let origon = new Vertex(
+                let origin = new Vertex(
                     this.tileManager.tiles.indexOf(this.clientUser.tileIn),
                     0,
                     this.clientUser.tileIn,
                     null
                 );
-                openList.push(origon);
+
+                openList.push(origin);
+
                 while (openList != []) {
+                    openList.sort((a, b) => {
+                        return a.fvalue - b.fvalue;
+                    });
+
+                    let q = openList[0];
+                    
+                    openList.shift()
+                    
                     const possibilities = [
-                        openList[0].tile.neighborTop,
-                        openList[0].tile.neighborBottom,
-                        openList[0].tile.neighborRight,
-                        openList[0].tile.neighborLeft,
+                        q.tile.neighborTop,
+                        q.tile.neighborBottom,
+                        q.tile.neighborRight,
+                        q.tile.neighborLeft,
                     ];
-                    const childNodes: Array<Vertex> = [];
 
                     for (var i = 0; i < possibilities.length; i++) {
                         if (possibilities[i].hasWall != true) {
@@ -174,14 +183,8 @@ export default class StateManager {
                             );
 
                             const tile = possibilities[i];
-                            
-                            closedList.push(openList[0]);
-                            openList.shift();
 
-                            const previousTile = closedList.slice(-1)[0];
-
-                            // console.log(previousTile)
-
+                            const previousTile = q;
 
                             const vertex = new Vertex(
                                 tileId,
@@ -190,41 +193,29 @@ export default class StateManager {
                                 previousTile
                             );
 
-                            childNodes.push(vertex);
+                            if (Math.floor(vertex.heuristicdistance) == 1) {
+                                console.log(vertex);
+                                openList = [];
+                                break;
+                            } else if (
+                                openList.some(
+                                    (title) => title.tileId === vertex.tileId
+                                )
+                            ) {
+                                continue;
+                            } else if (
+                                closedList.some(
+                                    (title) => title.tileId === vertex.tileId
+                                )
+                            ) {
+                                continue;
+                            } else {
+                                openList.push(vertex);
+                            }
                         }
                     }
 
-                    childNodes.sort((a, b) => {
-                        return a.fvalue - b.fvalue;
-                    });
-                    
-                    for(var i = 0; i < childNodes.length; i++){
-                        if (
-                            Math.floor(childNodes[i].heuristicdistance) <= 1
-                        ) {
-                             console.log(childNodes[i]);
-                             console.log(openList)
-                             console.log(closedList)
-                             openList = []
-                             break
-                        } else if (openList.includes(childNodes[i])) {
-                            if (
-                                openList[openList.indexOf(childNodes[i])].fvalue <
-                                childNodes[i].fvalue
-                            ) {
-                                openList.splice(openList.indexOf(childNodes[i]), 1);
-                            }
-                        } else if (closedList.includes(childNodes[i])) {
-                            if (
-                                closedList[closedList.indexOf(childNodes[i])].fvalue <
-                                childNodes[i].fvalue
-                            ) {
-                                closedList.splice(closedList.indexOf(childNodes[i]), 1);
-                            }
-                        } else {
-                            openList.push(childNodes[i]);
-                        }
-                    }
+                    closedList.push(q);
                 }
             });
         }
