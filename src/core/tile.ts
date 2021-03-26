@@ -22,10 +22,10 @@ export default class Tile {
         this.tile.addEventListener("contextmenu", () => {
             if (this.hasWall === true) {
                 this.removeWall();
-                this.recalcNeighbors();
+                // this.recalcNeighbors();
                 this.manager.manager.emitRemoveWall(this);
             } else {
-                this.addWallAndRecalc();
+                this.addWall();
                 this.manager.manager.emitWall(this);
             }
         });
@@ -34,10 +34,11 @@ export default class Tile {
             if (dragging === true) {
                 if (this.hasWall === true) {
                     this.removeWall();
-                    this.recalcNeighbors();
+                    // this.recalcNeighbors();
                     this.manager.manager.emitRemoveWall(this);
                 } else {
-                    this.addWallAndRecalc();
+                    this.addWall();
+                    // this.addWallAndRecalc();
                     this.manager.manager.emitWall(this);
                 }
             }
