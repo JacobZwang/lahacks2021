@@ -4,7 +4,7 @@
     // import StateManager from "../core/state-manager";
     import TileManager from "../core/tile-manager";
     import UserManager from "../core/user-manager";
-    import CanvasController from "../canvas/canvas";
+    import ClientController from "../canvas/index.ts";
 
     import SidePanel from "../components/SidePanel.svelte";
 
@@ -19,13 +19,13 @@
             console.log("revieved connection from socket");
         });
 
-        const canvas = new CanvasController(
+        const canvas = new ClientController(
             document.getElementById("canvas") as HTMLCanvasElement,
             30,
             30
         );
 
-        canvas.createTiles();
+        // canvas.createTiles();
     });
 </script>
 
