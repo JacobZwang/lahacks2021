@@ -6,6 +6,7 @@ export namespace World {
         tiles: Map<string, Tile.Model>;
         gridHeight: number;
         gridWidth: number;
+        controller: ClientWorldController;
 
         constructor(
             controller: ClientWorldController,
@@ -15,10 +16,19 @@ export namespace World {
             this.gridHeight = gridHeight;
             this.gridWidth = gridWidth;
             this.tiles = new Map();
+            this.controller = controller;
 
             new Array(this.gridWidth).fill("").forEach((_, x) => {
                 new Array(this.gridHeight).fill("").forEach((_, y) => {
                     this.tiles.set(`${x}:${y}`, new Tile.Model(x, y, this));
+                });
+            });
+
+            this.controller.controller.onWalls((payload) => {
+                payload.forEach((tileId) => {
+                    console.log(tileId);
+                    this.tiles.get(tileId).hasWall = true;
+                    controller.view.renderFrame();
                 });
             });
         }
@@ -274,6 +284,18 @@ export namespace Tile {
             }
 
             ctx.closePath();
+
+            if (this.viewModel.model.hasWall) {
+                ctx.beginPath();
+                ctx.rect(
+                    this.viewModel.x - (this.viewModel.width >> 1),
+                    this.viewModel.y - (this.viewModel.height >> 1),
+                    this.viewModel.width,
+                    this.viewModel.height
+                );
+                ctx.fill();
+                ctx.closePath();
+            }
         }
 
         isOver(x: number, y: number) {
@@ -338,26 +360,25 @@ export class ClientWorldController {
     model: World.Model;
     viewModel: World.ViewModel;
     view: World.View;
+    controller: ClientController;
 
-    constructor() {
+    constructor(controller: ClientController) {
+        this.controller = controller;
         this.model = new World.Model(this, 30, 30);
         this.viewModel = new World.ViewModel(this);
         this.view = new World.View(this);
     }
 }
 
-export default class ClientController {
+class ClientController {
     socket: Socket;
     users: Map<string, User>;
     world: ClientWorldController;
 
-    constructor() {
-        this.socket = undefined;
-        this.world = new ClientWorldController();
-    }
-
-    connect(io: Socket) {
+    constructor(io: Socket) {
         this.socket = io;
+        this.world = new ClientWorldController(this);
+        this.users = new Map();
     }
 
     onUserNew(callback: (user: User, payload?: UserPayload) => void) {
@@ -395,4 +416,12 @@ export default class ClientController {
             callback(payload.publicSessionId);
         });
     }
+
+    onWalls(callback: (walls: string[]) => void) {
+        this.socket.on("set:walls", (payload: string[]) => {
+            callback(payload);
+        });
+    }
 }
+
+export default ClientController;
