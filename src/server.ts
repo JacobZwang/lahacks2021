@@ -8,8 +8,10 @@ import HttpServer from "http";
 
 import templateWalls from "./templates/template-1/walls";
 
-const { PORT, NODE_ENV } = process.env;
+const { PORT, NODE_ENV, NAME } = process.env;
 const dev = NODE_ENV === "development";
+
+console.log("name",NAME);
 
 const app = express();
 app.use(
@@ -17,6 +19,8 @@ app.use(
     sirv("static", { dev }),
     sapper.middleware()
 );
+
+app.get('/name', (req, res)=>res.send(NAME))
 
 const httpServer = new HttpServer.Server(app);
 
