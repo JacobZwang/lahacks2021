@@ -178,6 +178,14 @@ export namespace World {
             this.canvas.addEventListener("wheel", (e) => {
                 e.preventDefault();
                 this.controller.viewModel.moveViewZ(e.deltaY);
+
+                this.tiles.forEach((tile) => {
+                    if (tile.isOver(e.x, e.y)) {
+                        tile.highlightOnFrame();
+                    } else {
+                        tile.render();
+                    }
+                });
             });
         }
 
