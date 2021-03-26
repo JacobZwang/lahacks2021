@@ -51,7 +51,7 @@ export namespace World {
 
         transformX(x: number) {
             return (
-                (x * this.transformZ(this.viewZ) + this.viewWidth) / 2 +
+                ((x * this.utilZ(this.viewZ) + this.viewWidth) >> 1) +
                 ((this.viewX * this.viewHeight) /
                     this.controller.model.gridHeight) *
                     this.viewZ
@@ -60,15 +60,22 @@ export namespace World {
 
         transformY(y: number) {
             return (
-                ((-y * this.transformZ(this.viewZ) + this.viewHeight) >> 1) -
+                ((-y * this.utilZ(this.viewZ) + this.viewHeight) >> 1) -
                 ((this.viewY * this.viewHeight) /
                     this.controller.model.gridHeight) *
                     this.viewZ
             );
         }
 
-        transformZ(z: number) {
+        private utilZ(z: number) {
             return (z * this.viewHeight) / this.controller.model.gridHeight;
+        }
+
+        transformZ(z: number) {
+            return (
+                ((z * this.viewHeight) / this.controller.model.gridHeight) *
+                this.viewZ
+            );
         }
 
         toUnitX(x: number) {
@@ -101,6 +108,12 @@ export namespace World {
                 this.viewY +
                 (-movementY / this.viewHeight / this.viewZ) *
                     this.controller.model.gridHeight;
+
+            if (render) this.controller.view.renderFrame();
+        }
+
+        moveViewZ(deltaY: number, render: boolean = true) {
+            this.viewZ = this.viewZ - (deltaY * this.viewZ) / 1000;
 
             if (render) this.controller.view.renderFrame();
         }
@@ -153,6 +166,11 @@ export namespace World {
                     );
                 }
             });
+
+            this.canvas.addEventListener("wheel", (e) => {
+                e.preventDefault();
+                this.controller.viewModel.moveViewZ(e.deltaY);
+            });
         }
 
         renderFrame() {
@@ -198,11 +216,11 @@ export namespace Tile {
         }
 
         get height() {
-            return this.parent.transformZ(1);
+            return this.parent.transformZ(0.5);
         }
 
         get width() {
-            return this.parent.transformZ(1);
+            return this.parent.transformZ(0.5);
         }
     }
 
