@@ -165,6 +165,14 @@ export namespace World {
                         e.movementY
                     );
                 }
+
+                this.tiles.forEach((tile) => {
+                    if (tile.isOver(e.x, e.y)) {
+                        tile.highlightOnFrame();
+                    } else {
+                        tile.render();
+                    }
+                });
             });
 
             this.canvas.addEventListener("wheel", (e) => {
@@ -227,6 +235,7 @@ export namespace Tile {
     export class View {
         viewModel: Tile.ViewModel;
         parent: World.View;
+        isHighlighted: boolean;
 
         constructor(viewModel: Tile.ViewModel, parent: World.View) {
             this.viewModel = viewModel;
@@ -235,16 +244,48 @@ export namespace Tile {
 
         render() {
             const ctx = this.parent.ctx;
-
-            ctx.beginPath();
-            ctx.rect(
-                this.viewModel.x - this.viewModel.width / 2,
-                this.viewModel.y - this.viewModel.height / 2,
+            ctx.clearRect(
+                this.viewModel.x - (this.viewModel.width >> 1),
+                this.viewModel.y - (this.viewModel.height >> 1),
                 this.viewModel.width,
                 this.viewModel.height
             );
-            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.rect(
+                this.viewModel.x - (this.viewModel.width >> 1),
+                this.viewModel.y - (this.viewModel.height >> 1),
+                this.viewModel.width,
+                this.viewModel.height
+            );
+
+            if (this.isHighlighted) {
+                ctx.fill();
+            } else {
+                ctx.stroke();
+            }
+
             ctx.closePath();
+        }
+
+        isOver(x: number, y: number) {
+            return (
+                x < this.viewModel.x + (this.viewModel.width >> 1) &&
+                x > this.viewModel.x - (this.viewModel.width >> 1) &&
+                y < this.viewModel.y + (this.viewModel.height >> 1) &&
+                y > this.viewModel.y - (this.viewModel.height >> 1)
+            );
+        }
+
+        highlight() {
+            this.isHighlighted = true;
+            this.render();
+        }
+
+        highlightOnFrame() {
+            this.isHighlighted = true;
+            this.render();
+            this.isHighlighted = false;
         }
     }
 }
