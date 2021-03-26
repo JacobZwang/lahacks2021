@@ -22,8 +22,6 @@ export namespace World {
                 });
             });
         }
-
-        connectToServer() {}
     }
 
     export class ViewModel {
@@ -53,21 +51,19 @@ export namespace World {
 
         transformX(x: number) {
             return (
-                (x * this.transformZ(this.viewZ) + this.viewWidth) >>
-                (1 +
-                    ((this.viewX * this.viewHeight) /
-                        this.controller.model.gridHeight) *
-                        this.viewZ)
+                (x * this.transformZ(this.viewZ) + this.viewWidth) / 2 +
+                ((this.viewX * this.viewHeight) /
+                    this.controller.model.gridHeight) *
+                    this.viewZ
             );
         }
 
         transformY(y: number) {
             return (
-                (-y * this.transformZ(this.viewZ) + this.viewHeight) >>
-                (1 -
-                    ((this.viewX * this.viewHeight) /
-                        this.controller.model.gridHeight) *
-                        this.viewZ)
+                ((-y * this.transformZ(this.viewZ) + this.viewHeight) >> 1) -
+                ((this.viewY * this.viewHeight) /
+                    this.controller.model.gridHeight) *
+                    this.viewZ
             );
         }
 
@@ -75,7 +71,45 @@ export namespace World {
             return (z * this.viewHeight) / this.controller.model.gridHeight;
         }
 
-        setTransformX() {}
+        toUnitX(x: number) {
+            return (
+                ((((x - this.viewWidth) >> 1) / this.viewWidth) *
+                    this.controller.model.gridHeight) /
+                this.viewZ
+            );
+        }
+
+        toUnitY(y: number) {
+            return (
+                ((((-y + this.viewHeight) >> 1) / this.viewHeight) *
+                    this.controller.model.gridHeight) /
+                this.viewZ
+            );
+        }
+
+        moveViewX(movementX: number, render: boolean = true) {
+            this.viewX =
+                this.viewX +
+                (movementX / this.viewHeight / this.viewZ) *
+                    this.controller.model.gridHeight;
+
+            if (render) this.controller.view.renderFrame();
+        }
+
+        moveViewY(movementY: number, render: boolean = true) {
+            this.viewY =
+                this.viewY +
+                (-movementY / this.viewHeight / this.viewZ) *
+                    this.controller.model.gridHeight;
+
+            if (render) this.controller.view.renderFrame();
+        }
+
+        moveView(movementX: number, movementY: number) {
+            this.moveViewX(movementX, false);
+            this.moveViewY(movementY, false);
+            this.controller.view.renderFrame();
+        }
     }
 
     export class View {
@@ -83,6 +117,7 @@ export namespace World {
         controller: ClientWorldController;
         canvas: HTMLCanvasElement;
         ctx: CanvasRenderingContext2D;
+        mousedown: boolean;
 
         constructor(controller: ClientWorldController) {
             this.tiles = new Set();
@@ -98,11 +133,34 @@ export namespace World {
                 this.tiles.add(new Tile.View(tile, this));
             });
 
+            this.renderFrame();
+
+            this.mousedown = false;
+
+            this.canvas.addEventListener("mousedown", (e) => {
+                this.mousedown = true;
+            });
+
+            this.canvas.addEventListener("mouseup", (e) => {
+                this.mousedown = false;
+            });
+
+            this.canvas.addEventListener("mousemove", (e) => {
+                if (this.mousedown === true) {
+                    this.controller.viewModel.moveView(
+                        e.movementX,
+                        e.movementY
+                    );
+                }
+            });
+        }
+
+        renderFrame() {
+            this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
             this.tiles.forEach((tile) => {
                 tile.render();
             });
-
-            this.canvas.addEventListener("mousedown", () => {});
         }
     }
 }
@@ -123,16 +181,28 @@ export namespace Tile {
     }
 
     export class ViewModel {
-        x: number;
-        y: number;
-        height: number;
-        width: number;
+        model: Tile.Model;
+        parent: World.ViewModel;
 
         constructor(model: Tile.Model, parent: World.ViewModel) {
-            this.x = parent.transformX(model.x);
-            this.y = parent.transformY(model.y);
-            this.height = parent.transformZ(1);
-            this.width = parent.transformZ(1);
+            this.model = model;
+            this.parent = parent;
+        }
+
+        get x() {
+            return this.parent.transformX(this.model.x);
+        }
+
+        get y() {
+            return this.parent.transformY(this.model.y);
+        }
+
+        get height() {
+            return this.parent.transformZ(1);
+        }
+
+        get width() {
+            return this.parent.transformZ(1);
         }
     }
 
