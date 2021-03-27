@@ -16,7 +16,8 @@
     "hooks": {
         "prebuild": {
             "commands": [
-              "gcloud config set project $GOOGLE_CLOUD_PROJECT && cbt createinstance $LOGS_DB $LOGS_DB $LOGS_DB $ZONE 1 SSD"
+                "gcloud config set project $GOOGLE_CLOUD_PROJECT",
+              "cbt createinstance $LOGS_DB $LOGS_DB $LOGS_DB $ZONE 1 SSD"
             ]
         }
     }
