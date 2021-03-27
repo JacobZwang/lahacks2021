@@ -317,29 +317,13 @@ export namespace Tile {
 
         render() {
             const ctx = this.parent.ctx;
+
             ctx.clearRect(
                 this.viewModel.x - (this.viewModel.width >> 1),
                 this.viewModel.y - (this.viewModel.height >> 1),
                 this.viewModel.width,
                 this.viewModel.height
             );
-
-            ctx.beginPath();
-            ctx.rect(
-                this.viewModel.x - (this.viewModel.width >> 1),
-                this.viewModel.y - (this.viewModel.height >> 1),
-                this.viewModel.width,
-                this.viewModel.height
-            );
-
-            if (this.isHighlighted) {
-                ctx.fillStyle = "lightgrey";
-                ctx.fill();
-            } else {
-                // ctx.stroke();
-            }
-
-            ctx.closePath();
 
             if (this.viewModel.model.hasWall) {
                 ctx.beginPath();
@@ -353,6 +337,20 @@ export namespace Tile {
                 ctx.fill();
                 ctx.closePath();
             }
+
+            if (this.isHighlighted) {
+                ctx.beginPath();
+                ctx.rect(
+                    this.viewModel.x - (this.viewModel.width >> 1) - 1,
+                    this.viewModel.y - (this.viewModel.height >> 1) - 1,
+                    this.viewModel.width,
+                    this.viewModel.height
+                );
+                ctx.fillStyle = "lightgrey";
+                ctx.fill();
+                ctx.closePath();
+            }
+            // ctx.stroke();
         }
 
         isOver(x: number, y: number) {
@@ -439,7 +437,7 @@ class ClientController {
     }
 
     onUserNew(callback: (user: User, payload?: UserPayload) => void) {
-        this.socket.on("new:user", (payload: UserPayload) => {
+        this.socket.on("set:user", (payload: UserPayload) => {
             this.users.set(payload.publicSessionId, User.fromPayload(payload));
             callback(this.users.get(payload.publicSessionId));
         });
@@ -447,8 +445,13 @@ class ClientController {
 
     onUserSet(callback: (user: User, payload?: UserPayload) => void) {
         this.socket.on("set:user", (payload: UserPayload) => {
-            this.users.set(payload.publicSessionId, User.fromPayload(payload));
-            callback(this.users.get(payload.publicSessionId));
+            if (this.users.get(payload.publicSessionId)) {
+                this.users.set(
+                    payload.publicSessionId,
+                    User.fromPayload(payload)
+                );
+                callback(this.users.get(payload.publicSessionId));
+            }
         });
     }
 
