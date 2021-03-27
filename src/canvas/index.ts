@@ -40,6 +40,14 @@ export namespace World {
                 this.tiles.get(payload).hasWall = false;
                 controller.view.renderFrame();
             });
+
+            this.controller.controller.onUserNew((user) => {});
+
+            this.controller.controller.onUserMove((payload) => {
+                this.tiles.get(
+                    `${payload.location.x}:${payload.location.y}`
+                ).hasUser = true;
+            });
         }
     }
 
@@ -174,7 +182,7 @@ export namespace World {
             this.rightDown = false;
 
             this.canvas.addEventListener("click", (e) => {
-                // move player
+                this.controller.controller.
             });
 
             this.canvas.addEventListener("mousedown", (e) => {
@@ -445,7 +453,7 @@ class ClientController {
 
     onUserSet(callback: (user: User, payload?: UserPayload) => void) {
         this.socket.on("set:user", (payload: UserPayload) => {
-            if (this.users.get(payload.publicSessionId)) {
+            if (!this.users.get(payload.publicSessionId)) {
                 this.users.set(
                     payload.publicSessionId,
                     User.fromPayload(payload)
@@ -457,8 +465,13 @@ class ClientController {
 
     onUserMove(callback: (user: User, payload?: UserPayload) => void) {
         this.socket.on("set:user", (payload: UserPayload) => {
-            this.users.set(payload.publicSessionId, User.fromPayload(payload));
-            callback(this.users.get(payload.publicSessionId));
+            if (this.users.get(payload.publicSessionId)) {
+                this.users.set(
+                    payload.publicSessionId,
+                    User.fromPayload(payload)
+                );
+                callback(this.users.get(payload.publicSessionId));
+            }
         });
     }
 
@@ -473,6 +486,7 @@ class ClientController {
         callback: (publicSessionId: string, payload?: UserPayload) => void
     ) {
         this.socket.on("del:user", (payload: UserPayload) => {
+            this.users.delete(payload.publicSessionId);
             callback(payload.publicSessionId);
         });
     }
@@ -501,6 +515,10 @@ class ClientController {
 
     emitDelWall(wallId: string) {
         this.socket.emit("del:wall", wallId);
+    }
+
+    emitUser(user: User) {
+        this.socket.emit("well:")
     }
 }
 
