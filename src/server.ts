@@ -5,14 +5,19 @@ import * as sapper from "@sapper/server";
 import http from "http";
 import { Server } from "socket.io";
 import HttpServer from "http";
-
+import {Bigtable} from "@google-cloud/bigtable"
 import templateWalls from "./templates/template-1/walls";
 
-const { PORT, NODE_ENV, NAME } = process.env;
+const { PORT, NODE_ENV, NAME, INSTANCE_ID } = process.env;
 const dev = NODE_ENV === "development";
 
-console.log("name",NAME);
-
+const bigtable = new Bigtable();
+const instance = bigtable.instance(INSTANCE_ID);
+const logsTable = instance.table('logs')
+logsTable.insert({
+    time: Date.now(),
+    log: 'logging is illegal'
+})
 const app = express();
 app.use(
     compression({ threshold: 0 }),
@@ -20,7 +25,6 @@ app.use(
     sapper.middleware()
 );
 
-app.get('/name', (req, res)=>res.send(NAME))
 
 const httpServer = new HttpServer.Server(app);
 

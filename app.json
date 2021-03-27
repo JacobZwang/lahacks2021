@@ -2,14 +2,25 @@
     "name": "LaHacks 2021",
     "env": {
         "NAME": {
-            "description": "LAHacks 2021 TESTING ENV VARIABLE"
+            "description": "Name"
+        },
+        "ZONE": {
+            "description": "Where do you want to host?",
+            "value": "us-west2-a",
+            "required": false
+        },
+        "LOGS_DB": {
+            "description": "BigTable Logs DB ID - Must be atleast 6 characters long"
         }
     },
     "hooks": {
         "prebuild": {
             "commands": [
-                "echo \"STARTING PREBUILD\"",
-                "echo $NAME"
+               "gcloud components update",
+               "gcloud components install cbt",
+               "cbt createinstance $LOGS_DB $LOGS_DB $LOGS_DB $ZONE 1 SSD",
+               "echo instance = $LOGS_DB >> ~/.cbtrc",
+               "cbt createtable logs"
             ]
         }
     }
