@@ -16,7 +16,7 @@
     "hooks": {
         "prebuild": {
             "commands": [
-               "cbt createinstance $LOGS_DB $LOGS_DB $LOGS_DB $ZONE 1 SSD -project GOOGLE_CLOUD_PROJECT && echo instance = $LOGS_DB >> ~/.cbtrc && cbt createtable logs"
+              "cbt createinstance $LOGS_DB $LOGS_DB $LOGS_DB $ZONE 1 SSD -project $GOOGLE_CLOUD_PROJECT"
             ]
         }
     }
