@@ -8,13 +8,12 @@
     onMount(() => {
         const socket = io();
 
-        // stateManager = new StateManager(30, 30, socket);
-
         socket.on("connection", () => {
             console.log("revieved connection from socket");
         });
 
         const controller = new ClientController(socket);
+        controller.world.viewModel.moveViewZ(-3500);
     });
 </script>
 

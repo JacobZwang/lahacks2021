@@ -26,10 +26,19 @@ export namespace World {
 
             this.controller.controller.onWalls((payload) => {
                 payload.forEach((tileId) => {
-                    console.log(tileId);
                     this.tiles.get(tileId).hasWall = true;
                     controller.view.renderFrame();
                 });
+            });
+
+            this.controller.controller.onWall((payload) => {
+                this.tiles.get(payload).hasWall = true;
+                controller.view.renderFrame();
+            });
+
+            this.controller.controller.onDelWall((payload) => {
+                this.tiles.get(payload).hasWall = false;
+                controller.view.renderFrame();
             });
         }
     }
@@ -140,7 +149,9 @@ export namespace World {
         controller: ClientWorldController;
         canvas: HTMLCanvasElement;
         ctx: CanvasRenderingContext2D;
-        mousedown: boolean;
+        middleDown: boolean;
+        leftDown: boolean;
+        rightDown: boolean;
 
         constructor(controller: ClientWorldController) {
             this.tiles = new Set();
@@ -158,18 +169,47 @@ export namespace World {
 
             this.renderFrame();
 
-            this.mousedown = false;
+            this.middleDown = false;
+            this.leftDown = false;
+            this.rightDown = false;
+
+            this.canvas.addEventListener("click", (e) => {
+                // move player
+            });
 
             this.canvas.addEventListener("mousedown", (e) => {
-                this.mousedown = true;
+                e.preventDefault();
+                if (e.button === 1) {
+                    this.middleDown = true;
+                } else if (e.button === 2) {
+                    this.tiles.forEach((tile) => {
+                        if (tile.isOver(e.x, e.y)) {
+                            if (tile.viewModel.model.hasWall) {
+                                this.controller.controller.emitDelWall(
+                                    `${tile.viewModel.model.x}:${tile.viewModel.model.y}`
+                                );
+                            } else {
+                                this.controller.controller.emitWall(
+                                    `${tile.viewModel.model.x}:${tile.viewModel.model.y}`
+                                );
+                            }
+                        }
+                    });
+
+                    this.rightDown = true;
+                }
             });
 
             this.canvas.addEventListener("mouseup", (e) => {
-                this.mousedown = false;
+                if (e.button === 1) {
+                    this.middleDown = false;
+                } else if (e.button === 2) {
+                    this.rightDown = false;
+                }
             });
 
             this.canvas.addEventListener("mousemove", (e) => {
-                if (this.mousedown === true) {
+                if (this.middleDown === true) {
                     this.controller.viewModel.moveView(
                         e.movementX,
                         e.movementY
@@ -179,6 +219,12 @@ export namespace World {
                 this.tiles.forEach((tile) => {
                     if (tile.isOver(e.x, e.y)) {
                         tile.highlightOnFrame();
+
+                        if (this.rightDown) {
+                            this.controller.controller.emitWall(
+                                `${tile.viewModel.model.x}:${tile.viewModel.model.y}`
+                            );
+                        }
                     } else {
                         tile.render();
                     }
@@ -188,6 +234,11 @@ export namespace World {
             this.canvas.addEventListener("wheel", (e) => {
                 e.preventDefault();
                 this.controller.viewModel.moveViewZ(e.deltaY);
+                console.log(
+                    this.controller.viewModel.viewX,
+                    this.controller.viewModel.viewY,
+                    this.controller.viewModel.viewZ
+                );
 
                 this.tiles.forEach((tile) => {
                     if (tile.isOver(e.x, e.y)) {
@@ -234,11 +285,15 @@ export namespace Tile {
         }
 
         get x() {
-            return this.parent.transformX(this.model.x);
+            return this.parent.transformX(
+                this.model.x - (this.parent.controller.model.gridWidth >> 1)
+            );
         }
 
         get y() {
-            return this.parent.transformY(this.model.y);
+            return this.parent.transformY(
+                this.model.y - (this.parent.controller.model.gridHeight >> 1)
+            );
         }
 
         get height() {
@@ -278,6 +333,7 @@ export namespace Tile {
             );
 
             if (this.isHighlighted) {
+                ctx.fillStyle = "lightgrey";
                 ctx.fill();
             } else {
                 ctx.stroke();
@@ -287,6 +343,7 @@ export namespace Tile {
 
             if (this.viewModel.model.hasWall) {
                 ctx.beginPath();
+                ctx.fillStyle = "black";
                 ctx.rect(
                     this.viewModel.x - (this.viewModel.width >> 1),
                     this.viewModel.y - (this.viewModel.height >> 1),
@@ -364,7 +421,7 @@ export class ClientWorldController {
 
     constructor(controller: ClientController) {
         this.controller = controller;
-        this.model = new World.Model(this, 30, 30);
+        this.model = new World.Model(this, 30, 60);
         this.viewModel = new World.ViewModel(this);
         this.view = new World.View(this);
     }
@@ -421,6 +478,26 @@ class ClientController {
         this.socket.on("set:walls", (payload: string[]) => {
             callback(payload);
         });
+    }
+
+    onWall(callback: (wall: string) => void) {
+        this.socket.on("set:wall", (payload: string) => {
+            callback(payload);
+        });
+    }
+
+    onDelWall(callback: (wall: string) => void) {
+        this.socket.on("del:wall", (payload: string) => {
+            callback(payload);
+        });
+    }
+
+    emitWall(wallId: string) {
+        this.socket.emit("set:wall", wallId);
+    }
+
+    emitDelWall(wallId: string) {
+        this.socket.emit("del:wall", wallId);
     }
 }
 
