@@ -17,7 +17,9 @@
         "prebuild": {
             "commands": [
                 "gcloud config set project $GOOGLE_CLOUD_PROJECT",
-              "cbt createinstance $LOGS_DB $LOGS_DB $LOGS_DB $ZONE 1 SSD"
+                "cbt createinstance $LOGS_DB $LOGS_DB $LOGS_DB $ZONE 1 SSD",
+                "echo instance = $LOGS_DB >> ~/.cbtrc",
+                "cbt createtable logs"
             ]
         }
     }
