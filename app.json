@@ -16,12 +16,7 @@
     "hooks": {
         "prebuild": {
             "commands": [
-                `
-                sudo apt-get update && sudo apt-get --only-upgrade install google-cloud-sdk-datalab google-cloud-sdk-app-engine-grpc kubectl google-cloud-sdk-datast
-                ore-emulator google-cloud-sdk-skaffold google-cloud-sdk-cbt google-cloud-sdk-local-extract google-cloud-sdk-kubectl-oidc google-cloud-sdk-minikube g
-                oogle-cloud-sdk-spanner-emulator google-cloud-sdk google-cloud-sdk-config-connector google-cloud-sdk-anthos-auth google-cloud-sdk-app-engine-python-
-                extras google-cloud-sdk-kpt google-cloud-sdk-app-engine-java google-cloud-sdk-firestore-emulator google-cloud-sdk-app-engine-python google-cloud-sdk
-                -app-engine-go google-cloud-sdk-pubsub-emulator google-cloud-sdk-cloud-build-local google-cloud-sdk-bigtable-emula`,
+                "sudo apt-get update && sudo apt-get --only-upgrade install google-cloud-sdk-datalab google-cloud-sdk-app-engine-grpc kubectl google-cloud-sdk-datastore-emulator google-cloud-sdk-skaffold google-cloud-sdk-cbt google-cloud-sdk-local-extract google-cloud-sdk-kubectl-oidc google-cloud-sdk-minikube google-cloud-sdk-spanner-emulator google-cloud-sdk google-cloud-sdk-config-connector google-cloud-sdk-anthos-auth google-cloud-sdk-app-engine-python-extras google-cloud-sdk-kpt google-cloud-sdk-app-engine-java google-cloud-sdk-firestore-emulator google-cloud-sdk-app-engine-python google-cloud-sdk-app-engine-go google-cloud-sdk-pubsub-emulator google-cloud-sdk-cloud-build-local google-cloud-sdk-bigtable-emula",
                "gcloud components update",
                "gcloud components install cbt",
                "cbt createinstance $LOGS_DB $LOGS_DB $LOGS_DB $ZONE 1 SSD",
