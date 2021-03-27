@@ -336,7 +336,7 @@ export namespace Tile {
                 ctx.fillStyle = "lightgrey";
                 ctx.fill();
             } else {
-                ctx.stroke();
+                // ctx.stroke();
             }
 
             ctx.closePath();
