@@ -126,12 +126,6 @@ body {
     margin: 0.7em;
 }
 
-.slide li {
-    margin-top: 0.2em;
-    margin-bottom: 0.2em;
-    margin-left: 3em;
-    margin-right: 3em;
-}
 
 /* Highlight.js used for coloring pre > code blocks. */
 .slide pre > code {
