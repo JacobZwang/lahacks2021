@@ -76,7 +76,7 @@ It is focused on plugin functionality, not the visual style of your presentation
 }
 .impress-enabled #impress-help {
     background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
-    color: #EEEEEE;
+    color: #95ffef;
     font-size: 80%;
     position: fixed;
     left: 2em;
