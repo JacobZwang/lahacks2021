@@ -61,14 +61,26 @@
         <h1><b>Tech Stack</b></h1>
         <img src="./tech.png" height="600px"/>
     </div>
-         
+    <div id="clicktodeploy" class="step" data-x="3000" data-z="-1000" data-rotate-y="90">
+        <h1><b>Click to Deploy</b></h1>
+        <p>We created a click to deploy button on Google Cloud that automatically configures the necessary services to have a working tool in approximately two minutes.</p>
+        <a href="https://deploy.cloud.run/?git_repo=https://github.com/JacobZwang/lahacks2021.git" style="background: none;"><img style="background: none;" src="https://deploy.cloud.run/button.svg"/></a>
+    </div>
+    <div id="webrtc" class="step" data-x="3000" data-z="-2000" data-rotate-y="90">
+        <h1><b>WebRTC</b></h1>
+        <p>
+            We implemented peer to peer video and audio data tracks using <b>WebRTC</b>. The WebRTC handshake was facilitated though our own signaling server, which allowed us to take total control over who people connected to. We used Google's public STUN server to handle our ICE candidates.
+        </p>
+    </div>
+    <div id="spatialaudio" class="step" data-x="3000" data-z="-3000" data-rotate-y="90">
+        <h1><b>Spatial Audio</b></h1>
+        <p>
+            We implemented the <b>A* Path Finding Algorithm</b> to solve for the shortest path between users, and adjusted sound volume according to user distance to create an immersive feeling. We chose <b>A*</b> over <b>Visualize Dijkstra's</b> because of its higher performance in open spaces.
+        </p>
+    </div>
+  
     
-        <div class="hint">
-            <p>
-                Use a spacebar or arrow keys to navigate. <br />
-                Press 'P' to launch speaker console.
-            </p>
-        </div>
+    
         <script>
             if ("ontouchstart" in document.documentElement) {
                 document.querySelector(".hint").innerHTML =
