@@ -17,7 +17,7 @@
     });
 </script>
 
-<!-- <SidePanel {stateManager} /> -->
+<SidePanel />
 <!-- <div id="grid" /> -->
 <canvas id="canvas" />
 
