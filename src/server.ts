@@ -14,9 +14,12 @@ const dev = NODE_ENV === "development";
 const bigtable = new Bigtable();
 const instance = bigtable.instance(LOGS_DB);
 const logsTable = instance.table('logs')
+const now = new Date();
 logsTable.insert({
-    time: Date.now(),
-    log: 'logging is illegal'
+    key: now.getTime(),
+    data: {
+        logs: "are illegal"
+    }
 })
 const app = express();
 app.use(
