@@ -1,6 +1,17 @@
 import { io } from "socket.io-client";
 import type { Socket } from "socket.io-client";
 
+function uuidv4() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+        /[xy]/g,
+        function (c) {
+            var r = (Math.random() * 16) | 0,
+                v = c == "x" ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        }
+    );
+}
+
 export namespace World {
     export class Model {
         tiles: Map<string, Tile.Model>;
@@ -41,12 +52,13 @@ export namespace World {
                 controller.view.renderFrame();
             });
 
-            this.controller.controller.onUserNew((user) => {});
+            this.controller.controller.onUserNew((user) => {
+                this.controller.controller.users.set(user.id, user);
+            });
 
             this.controller.controller.onUserMove((payload) => {
-                this.tiles.get(
-                    `${payload.location.x}:${payload.location.y}`
-                ).hasUser = true;
+                this.controller.controller.users.set(payload.id, payload);
+                this.controller.view.renderFrame();
             });
         }
     }
@@ -175,14 +187,30 @@ export namespace World {
                 this.tiles.add(new Tile.View(tile, this));
             });
 
-            this.renderFrame();
+            this.ctx.globalCompositeOperation = "lighter";
+
+            // this.renderFrame();
 
             this.middleDown = false;
             this.leftDown = false;
             this.rightDown = false;
 
             this.canvas.addEventListener("click", (e) => {
-                this.controller.controller.
+                for (const tile of this.tiles) {
+                    if (tile.isOver(e.x, e.y)) {
+                        this.controller.controller.emitUser(
+                            new User(
+                                this.controller.controller.socket.id,
+                                "Guest User",
+                                {
+                                    x: tile.viewModel.model.x,
+                                    y: tile.viewModel.model.y,
+                                }
+                            )
+                        );
+                        break;
+                    }
+                }
             });
 
             this.canvas.addEventListener("mousedown", (e) => {
@@ -242,11 +270,6 @@ export namespace World {
             this.canvas.addEventListener("wheel", (e) => {
                 e.preventDefault();
                 this.controller.viewModel.moveViewZ(e.deltaY);
-                console.log(
-                    this.controller.viewModel.viewX,
-                    this.controller.viewModel.viewY,
-                    this.controller.viewModel.viewZ
-                );
 
                 this.tiles.forEach((tile) => {
                     if (tile.isOver(e.x, e.y)) {
@@ -273,13 +296,23 @@ export namespace Tile {
         x: number;
         y: number;
         hasWall: boolean;
-        hasUser: boolean;
+        parent: World.Model;
 
         constructor(x: number, y: number, parent: World.Model) {
             this.x = x;
             this.y = y;
             this.hasWall = false;
-            this.hasUser = false;
+            this.parent = parent;
+        }
+
+        get user(): User | undefined {
+            let temp = undefined;
+            this.parent.controller.controller.users.forEach((user) => {
+                if (user.location.x === this.x && user.location.y === this.y) {
+                    temp = user;
+                }
+            });
+            return temp;
         }
     }
 
@@ -343,18 +376,32 @@ export namespace Tile {
                     this.viewModel.height
                 );
                 ctx.fill();
+                ctx.stroke();
+                ctx.closePath();
+            }
+
+            if (this.viewModel.model.user !== undefined) {
+                ctx.beginPath();
+                ctx.rect(
+                    this.viewModel.x - (this.viewModel.width >> 1) + 1,
+                    this.viewModel.y - (this.viewModel.height >> 1) + 1,
+                    this.viewModel.width - 2,
+                    this.viewModel.height - 2
+                );
+                ctx.fillStyle = "blue";
+                ctx.fill();
                 ctx.closePath();
             }
 
             if (this.isHighlighted) {
                 ctx.beginPath();
                 ctx.rect(
-                    this.viewModel.x - (this.viewModel.width >> 1) - 1,
-                    this.viewModel.y - (this.viewModel.height >> 1) - 1,
-                    this.viewModel.width,
-                    this.viewModel.height
+                    this.viewModel.x - (this.viewModel.width >> 1) + 1,
+                    this.viewModel.y - (this.viewModel.height >> 1) + 1,
+                    this.viewModel.width - 2,
+                    this.viewModel.height - 2
                 );
-                ctx.fillStyle = "lightgrey";
+                ctx.fillStyle = "rgba(230, 230, 230, 0.5)";
                 ctx.fill();
                 ctx.closePath();
             }
@@ -363,10 +410,10 @@ export namespace Tile {
 
         isOver(x: number, y: number) {
             return (
-                x < this.viewModel.x + (this.viewModel.width >> 1) &&
-                x > this.viewModel.x - (this.viewModel.width >> 1) &&
-                y < this.viewModel.y + (this.viewModel.height >> 1) &&
-                y > this.viewModel.y - (this.viewModel.height >> 1)
+                x <= this.viewModel.x + (this.viewModel.width >> 1) &&
+                x >= this.viewModel.x - (this.viewModel.width >> 1) &&
+                y <= this.viewModel.y + (this.viewModel.height >> 1) &&
+                y >= this.viewModel.y - (this.viewModel.height >> 1)
             );
         }
 
@@ -389,32 +436,31 @@ export type Coordinate = {
 };
 
 export type UserPayload = {
-    publicSessionId: string;
-    displayName?: string;
-    location?: Coordinate;
+    id: string;
+    displayName: string;
+    location: Coordinate;
 };
 
 export class User {
     location: Coordinate;
     displayName: string;
-    publicSessionId: string;
+    id: string;
 
-    constructor(
-        publicSessionId: string,
-        displayName: string,
-        location?: Coordinate
-    ) {
-        this.location = undefined;
+    constructor(id: string, displayName: string, location: Coordinate) {
+        this.location = location;
         this.displayName = displayName;
+        this.id = id;
     }
 
     static fromPayload(payload: {
-        publicSessionId: string;
+        id: string;
         displayName?: string;
+        location: Coordinate;
     }) {
         return new User(
-            payload.publicSessionId,
-            payload.displayName ?? "Unnamed"
+            payload.id,
+            payload.displayName ?? "Unnamed",
+            payload.location
         );
     }
 }
@@ -446,48 +492,41 @@ class ClientController {
 
     onUserNew(callback: (user: User, payload?: UserPayload) => void) {
         this.socket.on("set:user", (payload: UserPayload) => {
-            this.users.set(payload.publicSessionId, User.fromPayload(payload));
-            callback(this.users.get(payload.publicSessionId));
-        });
-    }
-
-    onUserSet(callback: (user: User, payload?: UserPayload) => void) {
-        this.socket.on("set:user", (payload: UserPayload) => {
-            if (!this.users.get(payload.publicSessionId)) {
-                this.users.set(
-                    payload.publicSessionId,
-                    User.fromPayload(payload)
-                );
-                callback(this.users.get(payload.publicSessionId));
+            if (!this.users.get(payload.id)) {
+                this.users.set(payload.id, User.fromPayload(payload));
+                callback(this.users.get(payload.id));
             }
         });
     }
+
+    // onUserSet(callback: (user: User, payload?: UserPayload) => void) {
+    //     this.socket.on("set:user", (payload: UserPayload) => {
+    //         if (!this.users.get(payload.id)) {
+    //             this.users.set(payload.id, User.fromPayload(payload));
+    //             callback(this.users.get(payload.id));
+    //         }
+    //     });
+    // }
 
     onUserMove(callback: (user: User, payload?: UserPayload) => void) {
         this.socket.on("set:user", (payload: UserPayload) => {
-            if (this.users.get(payload.publicSessionId)) {
-                this.users.set(
-                    payload.publicSessionId,
-                    User.fromPayload(payload)
-                );
-                callback(this.users.get(payload.publicSessionId));
+            if (this.users.get(payload.id)) {
+                callback(User.fromPayload(payload));
             }
         });
     }
 
-    onUserStatus(callback: (user: User, payload?: UserPayload) => void) {
-        this.socket.on("set:user", (payload: UserPayload) => {
-            this.users.set(payload.publicSessionId, User.fromPayload(payload));
-            callback(this.users.get(payload.publicSessionId));
-        });
-    }
+    // onUserStatus(callback: (user: User, payload?: UserPayload) => void) {
+    //     this.socket.on("set:user", (payload: UserPayload) => {
+    //         this.users.set(payload.id, User.fromPayload(payload));
+    //         callback(this.users.get(payload.id));
+    //     });
+    // }
 
-    onUserLeave(
-        callback: (publicSessionId: string, payload?: UserPayload) => void
-    ) {
+    onUserLeave(callback: (id: string, payload?: UserPayload) => void) {
         this.socket.on("del:user", (payload: UserPayload) => {
-            this.users.delete(payload.publicSessionId);
-            callback(payload.publicSessionId);
+            this.users.delete(payload.id);
+            callback(payload.id);
         });
     }
 
@@ -518,7 +557,11 @@ class ClientController {
     }
 
     emitUser(user: User) {
-        this.socket.emit("well:")
+        this.socket.emit("set:user", {
+            id: user.id,
+            location: user.location,
+            displayName: user.displayName,
+        });
     }
 }
 
