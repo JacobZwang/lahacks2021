@@ -12,7 +12,7 @@
 <div id="side-panel">
     <h1>Project Name</h1>
     <div id="tabs">
-        <button>Welcome, <b>Guest User!</b></button></div>
+        <button>Welcome, <b>Guest User</b>!</button></div>
     <div id="tabs">
         <button> Debug Tools </button>
     </div>
