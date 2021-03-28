@@ -1,7 +1,7 @@
 <script lang="ts">
     import { io } from "socket.io-client";
     import { onMount } from "svelte";
-    import ClientController from "../canvas/index";
+    import ClientController from "../core/index";
 
     import SidePanel from "../components/SidePanel.svelte";
 
@@ -18,7 +18,6 @@
 </script>
 
 <SidePanel />
-<!-- <div id="grid" /> -->
 <canvas id="canvas" />
 
 <style>

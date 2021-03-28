@@ -1,17 +1,6 @@
 import { io } from "socket.io-client";
 import type { Socket } from "socket.io-client";
 
-function uuidv4() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-        /[xy]/g,
-        function (c) {
-            var r = (Math.random() * 16) | 0,
-                v = c == "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        }
-    );
-}
-
 export namespace World {
     export class Model {
         tiles: Map<string, Tile.Model>;
@@ -297,12 +286,20 @@ export namespace Tile {
         y: number;
         hasWall: boolean;
         parent: World.Model;
+        neighborTop: Tile.Model;
+        neighborBottom: Tile.Model;
+        neighborRight: Tile.Model;
+        neighborLeft: Tile.Model;
 
         constructor(x: number, y: number, parent: World.Model) {
             this.x = x;
             this.y = y;
             this.hasWall = false;
             this.parent = parent;
+            this.neighborTop = this.parent.tiles.get(`${x}:${y + 1}`);
+            this.neighborBottom = this.parent.tiles.get(`${x}:${y - 1}`);
+            this.neighborRight = this.parent.tiles.get(`${x + 1}:${y}`);
+            this.neighborLeft = this.parent.tiles.get(`${x - 1}:${y}`);
         }
 
         get user(): User | undefined {
@@ -490,6 +487,10 @@ class ClientController {
         this.users = new Map();
     }
 
+    get clientUser() {
+        return this.users.get(this.socket.id);
+    }
+
     onUserNew(callback: (user: User, payload?: UserPayload) => void) {
         this.socket.on("set:user", (payload: UserPayload) => {
             if (!this.users.get(payload.id)) {
@@ -562,6 +563,127 @@ class ClientController {
             location: user.location,
             displayName: user.displayName,
         });
+    }
+
+    calculateDistancesFromClient() {
+        class Vertex {
+            tileId: string;
+            distancefromuser: number;
+            heuristicdistance: number;
+            fvalue: number;
+            tile: Tile.Model;
+            previousTile: Vertex;
+
+            constructor(
+                tileId: string,
+                heuristicdistance: number,
+                tile: Tile.Model,
+                previousTile: Vertex
+            ) {
+                this.tileId = tileId;
+                this.distancefromuser =
+                    this.previousTile != null
+                        ? this.previousTile.distancefromuser + 1
+                        : 1;
+                this.heuristicdistance = heuristicdistance;
+                this.fvalue = this.heuristicdistance + this.distancefromuser;
+                this.tile = tile;
+                this.previousTile = previousTile;
+            }
+        }
+
+        let users = this.users;
+
+        for (let k of users.keys()) {
+            if (k == undefined) users.delete(k);
+        }
+
+        if (users != undefined) {
+            users.forEach((user) => {
+                let openList: Array<Vertex> = [];
+                let closedList: Array<Vertex> = [];
+
+                const userx = user.location.x;
+                const usery = user.location.y;
+
+                let origin = new Vertex(
+                    `${this.clientUser.location.x}:${this.clientUser.location.y}`,
+                    0,
+                    this.world.model.tiles.get(
+                        `${this.clientUser.location.x}:${this.clientUser.location.y}`
+                    ),
+                    null
+                );
+
+                openList.push(origin);
+
+                while (openList != []) {
+                    openList.sort((a, b) => {
+                        return a.fvalue - b.fvalue;
+                    });
+
+                    let q = openList[0];
+
+                    openList.shift();
+
+                    const possibilities = [
+                        q.tile.neighborTop,
+                        q.tile.neighborBottom,
+                        q.tile.neighborRight,
+                        q.tile.neighborLeft,
+                    ];
+
+                    for (var i = 0; i < possibilities.length; i++) {
+                        if (possibilities[i].hasWall != true) {
+                            const x = possibilities[i].x;
+                            const y = possibilities[i].y;
+
+                            const tileId = `${possibilities[i].x}:${possibilities[i].y}`;
+
+                            const heuristicdistance = Math.sqrt(
+                                Math.pow(x - userx, 2) + Math.pow(y - usery, 2)
+                            );
+
+                            const tile = possibilities[i];
+
+                            const previousTile = q;
+
+                            const vertex = new Vertex(
+                                tileId,
+                                heuristicdistance,
+                                tile,
+                                previousTile
+                            );
+
+                            if (Math.floor(vertex.heuristicdistance) == 1) {
+                                console.log(vertex);
+                                openList = [];
+                                break;
+                            } else if (
+                                openList.some(
+                                    (title) => title.tileId === vertex.tileId
+                                )
+                            ) {
+                                continue;
+                            } else if (
+                                closedList.some(
+                                    (title) => title.tileId === vertex.tileId
+                                )
+                            ) {
+                                continue;
+                            } else {
+                                openList.push(vertex);
+                            }
+                        }
+                    }
+
+                    closedList.push(q);
+                }
+            });
+        }
+        // return "no possible paths"
+
+        //Initializing the open/closed lists
     }
 }
 

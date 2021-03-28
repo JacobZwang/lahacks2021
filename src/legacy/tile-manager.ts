@@ -1,7 +1,4 @@
-import Tile from "./tile";
-import type StateManager from "./state-manager";
-
-/**manages the tile container and the creation/management of tiles*/
+import Tile from "./tilert type StateManager from "./state-../core/state-manager*manages the tile container and the creation/management of tiles*/
 export default class TileManager {
     tiles: Tile[];
     target: HTMLDivElement;

@@ -5,29 +5,33 @@ import * as sapper from "@sapper/server";
 import http from "http";
 import { Server } from "socket.io";
 import HttpServer from "http";
-import {Bigtable} from "@google-cloud/bigtable"
+import { Bigtable } from "@google-cloud/bigtable";
 import templateWalls from "./templates/template-1/walls";
 
 const { PORT, NODE_ENV, NAME, LOGS_DB } = process.env;
 const dev = NODE_ENV === "development";
 
-const bigtable = new Bigtable();
-const instance = bigtable.instance(LOGS_DB);
-const logsTable = instance.table('logs')
-const now = new Date();
-logsTable.insert({
-    key: now.getTime(),
-    data: {
-        logs: "are illegal"
-    }
-})
+try {
+    const bigtable = new Bigtable();
+    const instance = bigtable.instance(LOGS_DB);
+    const logsTable = instance.table("logs");
+    const now = new Date();
+    logsTable.insert({
+        key: now.getTime(),
+        data: {
+            logs: "are illegal",
+        },
+    });
+} catch {
+    console.log("big table only works in production");
+}
+
 const app = express();
 app.use(
     compression({ threshold: 0 }),
     sirv("static", { dev }),
     sapper.middleware()
 );
-
 
 const httpServer = new HttpServer.Server(app);
 

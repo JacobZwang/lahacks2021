@@ -1,4 +1,4 @@
-import Wall from "./wall";
+import Wall from "../legacy/wallacy/wall";
 import type User from "./user";
 import type TileManager from "./tile-manager";
 
