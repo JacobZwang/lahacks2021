@@ -195,7 +195,8 @@ export namespace World {
                         this.controller.controller.emitUser(
                             new User(
                                 this.controller.controller.socket.id,
-                                "Guest User",
+                                controller.controller.clientUser?.displayName ??
+                                    "Guest User",
                                 {
                                     x: tile.viewModel.model.x,
                                     y: tile.viewModel.model.y,
@@ -432,6 +433,16 @@ export namespace Tile {
                 ctx.fillStyle = "blue";
                 ctx.fill();
                 ctx.closePath();
+
+                ctx.font = "12px Arial";
+                ctx.fillStyle = "white";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(
+                    this.viewModel.model.user.displayName,
+                    this.viewModel.x,
+                    this.viewModel.y
+                );
             }
 
             if (this.isHighlighted) {
@@ -446,7 +457,6 @@ export namespace Tile {
                 ctx.fill();
                 ctx.closePath();
             }
-            // ctx.stroke();
         }
 
         isOver(x: number, y: number) {
@@ -667,11 +677,13 @@ class ClientController {
     }
 
     emitUser(user: User) {
-        this.socket.emit("set:user", {
-            id: user.id,
-            location: user.location,
-            displayName: user.displayName,
-        });
+        if (user.location !== undefined) {
+            this.socket.emit("set:user", {
+                id: user.id,
+                location: user.location,
+                displayName: user.displayName,
+            });
+        }
     }
 
     userDistanceShim(user) {
@@ -789,7 +801,6 @@ class ClientController {
                         );
 
                         if (Math.floor(vertex.heuristicdistance) == 1) {
-                            console.log(vertex);
                             openList = [];
                             break;
                         } else if (
