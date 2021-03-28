@@ -379,21 +379,27 @@ export namespace Tile {
             if (this.viewModel.model.hasWall) {
                 ctx.beginPath();
                 ctx.fillStyle = "black";
-                if (this.viewModel.model.neighborRight?.hasWall) {
+                ctx.rect(
+                    /* 
+                    if (this.viewModel.model.neighborRight?.hasWall) {
                     ctx.rect(
-                        this.viewModel.x - (this.viewModel.width >> 2),
+                        1 ? this.viewModel.x - (this.viewModel.width >> 2): 0,
                         this.viewModel.y - (this.viewModel.height >> 2),
                         this.viewModel.width * 0.75,
                         this.viewModel.height >> 1
                     );
-                } else {
-                    ctx.rect(
-                        this.viewModel.x - (this.viewModel.width >> 2),
+                } */
+                        (this.viewModel.model.neighborLeft?.hasWall) ? (this.viewModel.x - (this.viewModel.width >> 1)): (this.viewModel.x - (this.viewModel.width >> 2)),
                         this.viewModel.y - (this.viewModel.height >> 2),
-                        this.viewModel.width >> 1,
+                        (this.viewModel.model.neighborRight?.hasWall && this.viewModel.model.neighborLeft?.hasWall) ? this.viewModel.width: (this.viewModel.model.neighborRight?.hasWall || this.viewModel.model.neighborLeft?.hasWall) ? this.viewModel.width * 0.75: this.viewModel.width >> 1,
                         this.viewModel.height >> 1
                     );
-                }
+                ctx.rect(
+                        this.viewModel.x - (this.viewModel.width >> 2),
+                        (this.viewModel.model.neighborTop?.hasWall) ? (this.viewModel.y - (this.viewModel.height >> 1)): (this.viewModel.y - (this.viewModel.height >> 2)),
+                        this.viewModel.width >> 1,
+                        (this.viewModel.model.neighborTop?.hasWall && this.viewModel.model.neighborBottom?.hasWall) ? this.viewModel.height: (this.viewModel.model.neighborTop?.hasWall || this.viewModel.model.neighborBottom?.hasWall) ? this.viewModel.height * 0.75: this.viewModel.width >> 1,
+                )
                 ctx.fill();
                 ctx.stroke();
                 ctx.closePath();
