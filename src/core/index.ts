@@ -302,16 +302,18 @@ export namespace Tile {
         get neighborTop() {
             return this.parent.tiles.get(`${this.x}:${this.y + 1}`);
         }
-        get neighborTop() {
+
+        get neighborBottom() {
             return this.parent.tiles.get(`${this.x}:${this.y - 1}`);
         }
+
         get neighborRight() {
             return this.parent.tiles.get(`${this.x + 1}:${this.y}`);
         }
+
         get neighborLeft() {
             return this.parent.tiles.get(`${this.x - 1}:${this.y}`);
         }
-        
 
         get user(): User | undefined {
             let temp = undefined;
@@ -377,22 +379,20 @@ export namespace Tile {
             if (this.viewModel.model.hasWall) {
                 ctx.beginPath();
                 ctx.fillStyle = "black";
-                if (this.viewModel.model.neighborRight?.hasWall){
-                
-                ctx.rect(
-                    this.viewModel.x - (this.viewModel.width >> 2),
-                    this.viewModel.y - (this.viewModel.height >> 2),
-                    this.viewModel.width * 0.75,
-                    this.viewModel.height >> 1
-                );
-                } else {
-         
+                if (this.viewModel.model.neighborRight?.hasWall) {
                     ctx.rect(
-                    this.viewModel.x - (this.viewModel.width >> 2),
-                    this.viewModel.y - (this.viewModel.height >> 2),
-                    this.viewModel.width >> 1,
-                    this.viewModel.height >> 1
-                    )
+                        this.viewModel.x - (this.viewModel.width >> 2),
+                        this.viewModel.y - (this.viewModel.height >> 2),
+                        this.viewModel.width * 0.75,
+                        this.viewModel.height >> 1
+                    );
+                } else {
+                    ctx.rect(
+                        this.viewModel.x - (this.viewModel.width >> 2),
+                        this.viewModel.y - (this.viewModel.height >> 2),
+                        this.viewModel.width >> 1,
+                        this.viewModel.height >> 1
+                    );
                 }
                 ctx.fill();
                 ctx.stroke();
