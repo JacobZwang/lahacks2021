@@ -389,7 +389,7 @@ export namespace Tile {
                         this.viewModel.height >> 1
                     );
                 } */
-                        this.viewModel.x - (this.viewModel.width >> 2),
+                        (this.viewModel.model.neighborLeft?.hasWall) ? (this.viewModel.x - (this.viewModel.width >> 1)): (this.viewModel.x - (this.viewModel.width >> 2)),
                         this.viewModel.y - (this.viewModel.height >> 2),
                         (this.viewModel.model.neighborRight?.hasWall && this.viewModel.model.neighborLeft?.hasWall) ? this.viewModel.width: (this.viewModel.model.neighborRight?.hasWall || this.viewModel.model.neighborLeft?.hasWall) ? this.viewModel.width * 0.75: this.viewModel.width >> 1,
                         this.viewModel.height >> 1
