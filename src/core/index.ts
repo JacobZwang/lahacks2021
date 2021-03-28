@@ -508,7 +508,6 @@ class ClientController {
         this.socket = io;
         this.world = new ClientWorldController(this);
         this.users = new Map();
-        this.RTCManager = new RTCManager(this.socket);
     }
 
     get clientUser() {
@@ -588,6 +587,10 @@ class ClientController {
     }
 
     emitUser(user: User) {
+        if (!this.RTCManager) {
+            this.RTCManager = new RTCManager(this.socket);
+        }
+
         this.socket.emit("set:user", {
             id: user.id,
             location: user.location,
