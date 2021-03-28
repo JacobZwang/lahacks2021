@@ -1,8 +1,11 @@
-<script>
-    let wallsOutput;
+<script lang="ts">
+    import type ClientController from "../core/index";
+    export let controller: ClientController;
+
+    let wallsOutput: string;
 
     function printWalls() {
-        wallsOutput = stateManager.getWallsAsJSON().toString();
+        wallsOutput = controller.getWalls().toString();
     }
 </script>
 
@@ -52,5 +55,9 @@
         background-color: rgba(243, 243, 243, 0.8);
         backdrop-filter: saturate(180%) blur(5px);
         -webkit-backdrop-filter: saturate(180%) blur(10px);
+    }
+
+    :global(video) {
+        width: 100%;
     }
 </style>

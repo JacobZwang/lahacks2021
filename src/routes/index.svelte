@@ -5,6 +5,7 @@
 
     import SidePanel from "../components/SidePanel.svelte";
 
+    let controller: ClientController;
     onMount(() => {
         const socket = io();
 
@@ -12,12 +13,13 @@
             console.log("revieved connection from socket");
         });
 
-        const controller = new ClientController(socket);
+        controller = new ClientController(socket);
         controller.world.viewModel.moveViewZ(-3500);
     });
 </script>
 
-<SidePanel />
+<SidePanel {controller} />
+
 <canvas id="canvas" />
 
 <style>

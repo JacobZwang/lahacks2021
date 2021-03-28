@@ -1,5 +1,6 @@
 import { io } from "socket.io-client";
 import type { Socket } from "socket.io-client";
+import RTCManager from "./rtc-manager";
 
 export namespace World {
     export class Model {
@@ -484,15 +485,23 @@ class ClientController {
     socket: Socket;
     users: Map<string, User>;
     world: ClientWorldController;
+    RTCManager: RTCManager;
 
     constructor(io: Socket) {
         this.socket = io;
         this.world = new ClientWorldController(this);
         this.users = new Map();
+        this.RTCManager = new RTCManager(this.socket);
     }
 
     get clientUser() {
         return this.users.get(this.socket.id);
+    }
+
+    getWalls() {
+        return Array.from(this.world.model.tiles.values())
+            .filter((tile) => tile.hasWall)
+            .map((wall) => `${wall.x}:${wall.y}`);
     }
 
     onUserNew(callback: (user: User, payload?: UserPayload) => void) {
