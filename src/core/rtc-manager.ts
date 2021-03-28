@@ -1,9 +1,12 @@
 import type { Socket } from "socket.io-client";
+import type ClientController from ".";
 
 export default class RTCManager {
     video: HTMLVideoElement;
+    controller: ClientController;
 
-    constructor(socket: Socket) {
+    constructor(socket: Socket, controller: ClientController) {
+        this.controller = controller;
         const config = {
             iceServers: [
                 {
@@ -64,7 +67,21 @@ export default class RTCManager {
             const newVideo = document.createElement("video");
             newVideo.setAttribute("playsinline", "");
             newVideo.setAttribute("autoplay", "");
+            newVideo.id = payload.id;
             document.getElementById("side-panel").appendChild(newVideo);
+
+            const volume =
+                (10 -
+                    this.controller.userDistanceShim(
+                        this.controller.users.get(payload.id)
+                    )) /
+                10;
+
+            if (volume > 0 && volume < 1) {
+                newVideo.volume = volume;
+            } else {
+                newVideo.volume = 0;
+            }
 
             connections.get(payload.id).ontrack = (e) => {
                 newVideo.srcObject = e.streams[0];
@@ -101,6 +118,7 @@ export default class RTCManager {
             const newVideo = document.createElement("video");
             newVideo.setAttribute("playsinline", "");
             newVideo.setAttribute("autoplay", "");
+            newVideo.id = payload.id;
             document.getElementById("side-panel").appendChild(newVideo);
 
             connections.get(payload.id).ontrack = (e) => {

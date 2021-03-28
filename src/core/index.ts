@@ -389,17 +389,33 @@ export namespace Tile {
                         this.viewModel.height >> 1
                     );
                 } */
-                        (this.viewModel.model.neighborLeft?.hasWall) ? (this.viewModel.x - (this.viewModel.width >> 1)): (this.viewModel.x - (this.viewModel.width >> 2)),
-                        this.viewModel.y - (this.viewModel.height >> 2),
-                        (this.viewModel.model.neighborRight?.hasWall && this.viewModel.model.neighborLeft?.hasWall) ? this.viewModel.width: (this.viewModel.model.neighborRight?.hasWall || this.viewModel.model.neighborLeft?.hasWall) ? this.viewModel.width * 0.75: this.viewModel.width >> 1,
-                        this.viewModel.height >> 1
-                    );
+                    this.viewModel.model.neighborLeft?.hasWall
+                        ? this.viewModel.x - (this.viewModel.width >> 1)
+                        : this.viewModel.x - (this.viewModel.width >> 2),
+                    this.viewModel.y - (this.viewModel.height >> 2),
+                    this.viewModel.model.neighborRight?.hasWall &&
+                        this.viewModel.model.neighborLeft?.hasWall
+                        ? this.viewModel.width
+                        : this.viewModel.model.neighborRight?.hasWall ||
+                          this.viewModel.model.neighborLeft?.hasWall
+                        ? this.viewModel.width * 0.75
+                        : this.viewModel.width >> 1,
+                    this.viewModel.height >> 1
+                );
                 ctx.rect(
-                        this.viewModel.x - (this.viewModel.width >> 2),
-                        (this.viewModel.model.neighborTop?.hasWall) ? (this.viewModel.y - (this.viewModel.height >> 1)): (this.viewModel.y - (this.viewModel.height >> 2)),
-                        this.viewModel.width >> 1,
-                        (this.viewModel.model.neighborTop?.hasWall && this.viewModel.model.neighborBottom?.hasWall) ? this.viewModel.height: (this.viewModel.model.neighborTop?.hasWall || this.viewModel.model.neighborBottom?.hasWall) ? this.viewModel.height * 0.75: this.viewModel.width >> 1,
-                )
+                    this.viewModel.x - (this.viewModel.width >> 2),
+                    this.viewModel.model.neighborTop?.hasWall
+                        ? this.viewModel.y - (this.viewModel.height >> 1)
+                        : this.viewModel.y - (this.viewModel.height >> 2),
+                    this.viewModel.width >> 1,
+                    this.viewModel.model.neighborTop?.hasWall &&
+                        this.viewModel.model.neighborBottom?.hasWall
+                        ? this.viewModel.height
+                        : this.viewModel.model.neighborTop?.hasWall ||
+                          this.viewModel.model.neighborBottom?.hasWall
+                        ? this.viewModel.height * 0.75
+                        : this.viewModel.width >> 1
+                );
                 ctx.fill();
                 ctx.stroke();
                 ctx.closePath();
@@ -514,6 +530,7 @@ class ClientController {
         this.socket = io;
         this.world = new ClientWorldController(this);
         this.users = new Map();
+        this.RTCManager = new RTCManager(this.socket, this);
     }
 
     get clientUser() {
@@ -546,11 +563,28 @@ class ClientController {
 
     onUserMove(callback: (user: User, payload?: UserPayload) => void) {
         this.socket.on("set:user", (payload: UserPayload) => {
-            this.calculateDistancesFromClient();
-
             if (this.users.get(payload.id)) {
                 callback(User.fromPayload(payload));
             }
+
+            this.users.forEach((user) => {
+                const video = document.getElementById(
+                    user.id
+                ) as HTMLVideoElement;
+
+                if (video) {
+                    const volume =
+                        (10 - this.userDistanceShim(this.users.get(user.id))) /
+                        10;
+
+                    if (volume > 0 && volume < 1) {
+                        video.volume = volume;
+                    } else {
+                        video.volume = 0;
+                    }
+                    console.log(video.volume);
+                }
+            });
         });
     }
 
@@ -577,12 +611,50 @@ class ClientController {
     onWall(callback: (wall: string) => void) {
         this.socket.on("set:wall", (payload: string) => {
             callback(payload);
+
+            this.users.forEach((user) => {
+                const video = document.getElementById(
+                    user.id
+                ) as HTMLVideoElement;
+
+                if (video) {
+                    const volume =
+                        (10 - this.userDistanceShim(this.users.get(user.id))) /
+                        10;
+
+                    if (volume > 0 && volume < 1) {
+                        video.volume = volume;
+                    } else {
+                        video.volume = 0;
+                    }
+                    console.log(video.volume);
+                }
+            });
         });
     }
 
     onDelWall(callback: (wall: string) => void) {
         this.socket.on("del:wall", (payload: string) => {
             callback(payload);
+
+            this.users.forEach((user) => {
+                const video = document.getElementById(
+                    user.id
+                ) as HTMLVideoElement;
+
+                if (video) {
+                    const volume =
+                        (10 - this.userDistanceShim(this.users.get(user.id))) /
+                        10;
+
+                    if (volume > 0 && volume < 1) {
+                        video.volume = volume;
+                    } else {
+                        video.volume = 0;
+                    }
+                    console.log(video.volume);
+                }
+            });
         });
     }
 
@@ -595,15 +667,40 @@ class ClientController {
     }
 
     emitUser(user: User) {
-        if (!this.RTCManager) {
-            this.RTCManager = new RTCManager(this.socket);
-        }
-
         this.socket.emit("set:user", {
             id: user.id,
             location: user.location,
             displayName: user.displayName,
         });
+    }
+
+    userDistanceShim(user) {
+        let arr: any = {};
+
+        Array.from(this.world.model.tiles.values()).forEach((tile) => {
+            if (arr[tile.y] === undefined) {
+                arr[tile.y] = {};
+            }
+
+            if (tile.hasWall === true) {
+                arr[tile.y][tile.x] = 0;
+            } else {
+                arr[tile.y][tile.x] = 1;
+            }
+
+            if (tile.x === this.world.model.gridWidth - 1) {
+                arr[tile.y] = Object.values(arr[tile.y]);
+            }
+        });
+
+        let graph = new Graph(Object.values(arr));
+
+        let start =
+            graph.grid[this.clientUser.location.y][this.clientUser.location.x];
+        let end = graph.grid[user.location.y][user.location.x];
+        let result = astar.search(graph, start, end);
+
+        return result.length;
     }
 
     calculateDistancesFromClient() {
