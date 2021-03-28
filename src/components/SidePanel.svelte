@@ -1,51 +1,56 @@
 <script>
-  export let stateManager;
+    let wallsOutput;
 
-  let wallsOutput;
-
-  function printWalls() {
-    wallsOutput = stateManager.getWallsAsJSON().toString();
-  }
+    function printWalls() {
+        wallsOutput = stateManager.getWallsAsJSON().toString();
+    }
 </script>
 
 <div id="side-panel">
-  <h1>Project Name</h1>
-  <div id="tabs">
-    <button> Debug Tools </button>
-  </div>
-  <button class="debug-button" on:click={printWalls}> Print Walls </button>
-  {#if wallsOutput !== undefined}
-    <div class="section">
-      {wallsOutput}
+    <h1>Project Name</h1>
+    <div id="tabs">
+        <button> Debug Tools </button>
     </div>
-  {/if}
-  <video id="self-video" playsinline autoplay muted />
+    <button class="debug-button" on:click={printWalls}> Print Walls </button>
+    {#if wallsOutput !== undefined}
+        <div class="section">
+            {wallsOutput}
+        </div>
+    {/if}
+    <video id="self-video" playsinline autoplay muted />
 </div>
 
 <style>
-  /* h1 {
+    /* h1 {
     border-bottom: 1pt solid black;
   } */
 
-  #tabs {
-    display: inline-flex;
-    width: 100%;
-    border-bottom: 1pt solid black;
-    font-weight: 600;
-  }
+    #tabs {
+        display: inline-flex;
+        width: 100%;
+        border-bottom: 1pt solid grey;
+        font-weight: 600;
+    }
 
-  .debug-button {
-    width: 100%;
-    text-align: left;
-  }
+    .debug-button {
+        width: 100%;
+        text-align: left;
+    }
 
-  .section {
-    width: 100%;
-    margin: var(--marpad);
-    overflow-wrap: anywhere;
-  }
+    .section {
+        width: 100%;
+        margin: var(--marpad);
+        overflow-wrap: anywhere;
+    }
 
-  #side-panel {
-    margin: var(--marpad);
-  }
+    #side-panel {
+        position: fixed;
+        width: 300pt;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(243, 243, 243, 0.8);
+        backdrop-filter: saturate(180%) blur(5px);
+        -webkit-backdrop-filter: saturate(180%) blur(10px);
+    }
 </style>

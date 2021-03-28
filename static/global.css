@@ -14,6 +14,24 @@ body {
     font-family: "Inter", sans-serif;
 }
 
+body {
+    background: linear-gradient(-45deg, #e6ae9d, #e79eba, #9ecfe0, #9bddce);
+    background-size: 400% 400%;
+    animation: gradient 30s ease infinite;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 h1,
 h2,
 h3,

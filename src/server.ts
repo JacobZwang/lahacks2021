@@ -53,12 +53,12 @@ io.on("connection", (socket) => {
 
     socket.on("set:wall", (payload) => {
         walls.add(payload);
-        socket.broadcast.emit("set:wall", payload);
+        io.emit("set:wall", payload);
     });
 
     socket.on("del:wall", (payload) => {
         walls.delete(payload);
-        socket.broadcast.emit("del:wall", payload);
+        io.emit("del:wall", payload);
     });
 
     socket.on("set:user", (payload) => {
@@ -71,7 +71,7 @@ io.on("connection", (socket) => {
             rtcConnections.set(payload.id, false);
         }
 
-        socket.broadcast.emit("set:user", payload);
+        io.emit("set:user", payload);
 
         users.forEach((i) => {
             if (
