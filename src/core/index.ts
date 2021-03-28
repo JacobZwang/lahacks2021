@@ -371,10 +371,10 @@ export namespace Tile {
                 ctx.beginPath();
                 ctx.fillStyle = "black";
                 ctx.rect(
-                    this.viewModel.x - (this.viewModel.width >> 1),
-                    this.viewModel.y - (this.viewModel.height >> 1),
-                    this.viewModel.width,
-                    this.viewModel.height
+                    this.viewModel.x - (this.viewModel.width >> 2),
+                    this.viewModel.y - (this.viewModel.height >> 2),
+                    this.viewModel.width >> 1,
+                    this.viewModel.height >> 1
                 );
                 ctx.fill();
                 ctx.stroke();
