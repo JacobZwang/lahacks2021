@@ -540,6 +540,8 @@ class ClientController {
 
     onUserMove(callback: (user: User, payload?: UserPayload) => void) {
         this.socket.on("set:user", (payload: UserPayload) => {
+            this.calculateDistancesFromClient();
+
             if (this.users.get(payload.id)) {
                 callback(User.fromPayload(payload));
             }
@@ -625,95 +627,89 @@ class ClientController {
             }
         }
 
-        let users = this.users;
+        let origin: Vertex;
 
-        for (let k of users.keys()) {
-            if (k == undefined) users.delete(k);
+        if (this.clientUser) {
+            origin = new Vertex(
+                `${this.clientUser.location.x}:${this.clientUser.location.y}`,
+                0,
+                this.world.model.tiles.get(
+                    `${this.clientUser.location.x}:${this.clientUser.location.y}`
+                ),
+                null
+            );
         }
 
-        if (users != undefined) {
-            users.forEach((user) => {
-                let openList: Array<Vertex> = [];
-                let closedList: Array<Vertex> = [];
+        this.users.forEach((user) => {
+            let openList: Vertex[] = [];
+            let closedList: Vertex[] = [];
 
-                const userx = user.location.x;
-                const usery = user.location.y;
+            const userx = user.location.x;
+            const usery = user.location.y;
 
-                let origin = new Vertex(
-                    `${this.clientUser.location.x}:${this.clientUser.location.y}`,
-                    0,
-                    this.world.model.tiles.get(
-                        `${this.clientUser.location.x}:${this.clientUser.location.y}`
-                    ),
-                    null
-                );
+            if (origin) openList.push(origin);
 
-                openList.push(origin);
+            while (openList.length !== 0) {
+                openList.sort((a, b) => {
+                    return a.fvalue - b.fvalue;
+                });
 
-                while (openList != []) {
-                    openList.sort((a, b) => {
-                        return a.fvalue - b.fvalue;
-                    });
+                let q = openList.shift();
 
-                    let q = openList[0];
+                const possibilities = [
+                    q?.tile.neighborTop,
+                    q?.tile.neighborBottom,
+                    q?.tile.neighborRight,
+                    q?.tile.neighborLeft,
+                ];
 
-                    openList.shift();
+                for (var i = 0; i < possibilities.length; i++) {
+                    if (possibilities[i]?.hasWall) {
+                        const x = possibilities[i].x;
+                        const y = possibilities[i].y;
 
-                    const possibilities = [
-                        q.tile.neighborTop,
-                        q.tile.neighborBottom,
-                        q.tile.neighborRight,
-                        q.tile.neighborLeft,
-                    ];
+                        const tileId = `${possibilities[i].x}:${possibilities[i].y}`;
 
-                    for (var i = 0; i < possibilities.length; i++) {
-                        if (possibilities[i].hasWall != true) {
-                            const x = possibilities[i].x;
-                            const y = possibilities[i].y;
+                        const heuristicdistance = Math.sqrt(
+                            Math.pow(x - userx, 2) + Math.pow(y - usery, 2)
+                        );
 
-                            const tileId = `${possibilities[i].x}:${possibilities[i].y}`;
+                        const tile = possibilities[i];
 
-                            const heuristicdistance = Math.sqrt(
-                                Math.pow(x - userx, 2) + Math.pow(y - usery, 2)
-                            );
+                        const previousTile = q;
 
-                            const tile = possibilities[i];
+                        const vertex = new Vertex(
+                            tileId,
+                            heuristicdistance,
+                            tile,
+                            previousTile
+                        );
 
-                            const previousTile = q;
-
-                            const vertex = new Vertex(
-                                tileId,
-                                heuristicdistance,
-                                tile,
-                                previousTile
-                            );
-
-                            if (Math.floor(vertex.heuristicdistance) == 1) {
-                                console.log(vertex);
-                                openList = [];
-                                break;
-                            } else if (
-                                openList.some(
-                                    (title) => title.tileId === vertex.tileId
-                                )
-                            ) {
-                                continue;
-                            } else if (
-                                closedList.some(
-                                    (title) => title.tileId === vertex.tileId
-                                )
-                            ) {
-                                continue;
-                            } else {
-                                openList.push(vertex);
-                            }
+                        if (Math.floor(vertex.heuristicdistance) == 1) {
+                            console.log(vertex);
+                            openList = [];
+                            break;
+                        } else if (
+                            openList.some(
+                                (title) => title.tileId === vertex.tileId
+                            )
+                        ) {
+                            continue;
+                        } else if (
+                            closedList.some(
+                                (title) => title.tileId === vertex.tileId
+                            )
+                        ) {
+                            continue;
+                        } else {
+                            openList.push(vertex);
                         }
                     }
-
-                    closedList.push(q);
                 }
-            });
-        }
+
+                closedList.push(q);
+            }
+        });
         // return "no possible paths"
 
         //Initializing the open/closed lists
