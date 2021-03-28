@@ -5,7 +5,7 @@
     let wallsOutput: string;
 
     function printWalls() {
-        wallsOutput = controller.getWalls().toString();
+        wallsOutput = JSON.stringify(controller.getWalls());
     }
 </script>
 
