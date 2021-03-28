@@ -1,10 +1,10 @@
 {
-  "extends": "@tsconfig/svelte/tsconfig.json",
-  "compilerOptions": {
-    "lib": ["DOM", "ESNext", "WebWorker"],
-    "noImplicitAny": true
-    // "strict": true
-  },
-  "include": ["src/**/*", "src/node_modules/**/*"],
-  "exclude": ["node_modules/*", "__sapper__/*", "static/*"]
+    "extends": "@tsconfig/svelte/tsconfig.json",
+    "compilerOptions": {
+        "lib": ["DOM", "ESNext", "WebWorker"],
+        "noImplicitAny": true
+        // "strict": true
+    },
+    "include": ["src/**/*", "src/node_modules/**/*"],
+    "exclude": ["node_modules/*", "__sapper__/*", "static/*", "src/legacy/*"]
 }

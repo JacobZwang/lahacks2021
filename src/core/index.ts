@@ -49,6 +49,10 @@ export namespace World {
                 this.controller.controller.users.set(payload.id, payload);
                 this.controller.view.renderFrame();
             });
+
+            this.controller.controller.onUserLeave((payload) => {
+                this.controller.view.renderFrame();
+            });
         }
     }
 
